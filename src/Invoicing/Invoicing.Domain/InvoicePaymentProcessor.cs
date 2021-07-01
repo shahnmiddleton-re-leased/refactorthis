@@ -8,7 +8,7 @@ namespace Invoicing.Domain
 
         public InvoicePaymentProcessor(IInvoiceRepository invoiceRepository)
         {
-            _invoiceRepository = invoiceRepository;
+            _invoiceRepository = invoiceRepository ?? throw new ArgumentNullException(nameof(invoiceRepository));
         }
 
         public string ProcessPayment(Payment payment)
