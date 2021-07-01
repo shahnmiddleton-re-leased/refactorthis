@@ -1,20 +1,24 @@
-﻿using System;
+﻿using Invoicing.Domain.Commands;
+using Invoicing.Domain.Rules;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Invoicing.Domain
 {
     public class Invoice
     {
         private readonly IInvoiceRepository _repository;
+        // TODO: for better separation, we can use notification / handler lib. i.e. MediatR
+        private readonly AbstractRuleEngine<AddPaymentCommand> _addPaymentRules;
         public decimal Amount { get; set; }
         public decimal AmountPaid { get; set; }
         private readonly List<Payment> _payments;
         public IReadOnlyCollection<Payment> Payments => _payments;
 
-        public Invoice(IInvoiceRepository repository)
+        public Invoice(IInvoiceRepository repository, AbstractRuleEngine<AddPaymentCommand> addPaymentRules)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _addPaymentRules = addPaymentRules ?? throw new ArgumentNullException(nameof(addPaymentRules));
             _payments = new List<Payment>();
         }
 
@@ -25,65 +29,15 @@ namespace Invoicing.Domain
                 throw new ArgumentNullException(nameof(payment));
             }
 
-            if (Amount == 0)
+            var result = _addPaymentRules.Run(new AddPaymentCommand(this, payment));
+
+            if (result.IsValid)
             {
-                if (!_payments.Any())
-                {
-                    return "no payment needed";
-                }
-                else
-                {
-                    throw new InvalidOperationException("The invoice is in an invalid state, it has an amount of 0 and it has payments.");
-                }
+                AmountPaid += payment.Amount;
+                _payments.Add(payment);
             }
-            else
-            {
-                if (_payments.Any())
-                {
-                    if (_payments.Sum(x => x.Amount) != 0 && Amount == _payments.Sum(x => x.Amount))
-                    {
-                        return "invoice was already fully paid";
-                    }
-                    else if (_payments.Sum(x => x.Amount) != 0 && payment.Amount > (Amount - AmountPaid))
-                    {
-                        return "the payment is greater than the partial amount remaining";
-                    }
-                    else
-                    {
-                        if ((Amount - AmountPaid) == payment.Amount)
-                        {
-                            AmountPaid += payment.Amount;
-                            _payments.Add(payment);
-                            return "final partial payment received, invoice is now fully paid";
-                        }
-                        else
-                        {
-                            AmountPaid += payment.Amount;
-                            _payments.Add(payment);
-                            return "another partial payment received, still not fully paid";
-                        }
-                    }
-                }
-                else
-                {
-                    if (payment.Amount > Amount)
-                    {
-                        return "the payment is greater than the invoice amount";
-                    }
-                    else if (Amount == payment.Amount)
-                    {
-                        AmountPaid = payment.Amount;
-                        _payments.Add(payment);
-                        return "invoice is now fully paid";
-                    }
-                    else
-                    {
-                        AmountPaid = payment.Amount;
-                        _payments.Add(payment);
-                        return "invoice is now partially paid";
-                    }
-                }
-            }
+
+            return result.Message;
         }
 
         public void Save()

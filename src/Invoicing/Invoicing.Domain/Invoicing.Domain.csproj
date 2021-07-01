@@ -38,12 +38,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\AddPaymentCommand.cs" />
     <Compile Include="IInvoiceRepository.cs" />
     <Compile Include="Invoice.cs" />
     <Compile Include="InvoicePaymentProcessor.cs" />
     <Compile Include="Payment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rules\AbstractRuleEngine.cs" />
+    <Compile Include="Rules\Invoicing\InvoiceAlreadyPaid.cs" />
+    <Compile Include="Rules\Invoicing\InvoiceRuleEngine.cs" />
+    <Compile Include="Rules\Invoicing\NoPaymentNeeded.cs" />
+    <Compile Include="Rules\Invoicing\PaymentEqualsAmount.cs" />
+    <Compile Include="Rules\Invoicing\PaymentFinal.cs" />
+    <Compile Include="Rules\Invoicing\PaymentGreaterThanAmount.cs" />
+    <Compile Include="Rules\Invoicing\PaymentGreaterThanRemainingAmount.cs" />
+    <Compile Include="Rules\Invoicing\PaymentLessThanAmount.cs" />
+    <Compile Include="Rules\Invoicing\PaymentLessThanRemainingAmount.cs" />
+    <Compile Include="Rules\IRule.cs" />
+    <Compile Include="Rules\RuleResult.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
 		 Other similar extension points exist, see Microsoft.Common.targets.

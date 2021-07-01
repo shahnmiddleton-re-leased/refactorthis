@@ -83,6 +83,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Customizations\InvoiceRuleEngineConcreteCustomization.cs" />
     <Compile Include="Customizations\InvoiceWithoutPaymentCustomization.cs" />
     <Compile Include="Customizations\InvoiceWithPaymentCustomization.cs" />
     <Compile Include="DefaultAutoDataAttribute.cs" />

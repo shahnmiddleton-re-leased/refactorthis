@@ -1,4 +1,6 @@
 ﻿using AutoFixture;
+using Invoicing.Domain.Commands;
+using Invoicing.Domain.Rules;
 
 namespace Invoicing.Domain.Tests.Customizations
 {
@@ -23,7 +25,9 @@ namespace Invoicing.Domain.Tests.Customizations
             fixture
                 .Register(() =>
                     {
-                        var invoice = new Invoice(fixture.Create<IInvoiceRepository>())
+                        var invoice = new Invoice(
+                            fixture.Create<IInvoiceRepository>(),
+                            fixture.Create<AbstractRuleEngine<AddPaymentCommand>>())
                         {
                             Amount = _amount,
                             AmountPaid = _amountPaid
@@ -31,7 +35,7 @@ namespace Invoicing.Domain.Tests.Customizations
 
                         invoice.AddPayment(new Payment { Amount = _paymentAmount });
                         return invoice;
-                    }); ;
+                    });
         }
     }
 }
