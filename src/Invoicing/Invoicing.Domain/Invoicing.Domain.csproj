@@ -38,14 +38,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IInvoiceRepository.cs" />
+    <Compile Include="Invoice.cs" />
     <Compile Include="InvoicePaymentProcessor.cs" />
+    <Compile Include="Payment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Invoicing.Infrastructure\Invoicing.Infrastructure.csproj">
-      <Project>{28b6f2fd-826d-4176-87c0-68c8e68245ab}</Project>
-      <Name>Invoicing.Infrastructure</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

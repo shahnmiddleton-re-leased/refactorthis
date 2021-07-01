@@ -1,4 +1,4 @@
-namespace Invoicing.Infrastructure
+﻿namespace Invoicing.Domain
 {
     public class Payment
     {

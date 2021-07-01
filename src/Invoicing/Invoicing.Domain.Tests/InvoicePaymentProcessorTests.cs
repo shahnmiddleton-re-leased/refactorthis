@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Invoicing.Infrastructure;
 using NUnit.Framework;
 
@@ -12,8 +11,6 @@ namespace Invoicing.Domain.Tests
         public void ProcessPayment_Should_ThrowException_When_NoInoiceFoundForPaymentReference()
         {
             var repo = new InvoiceRepository();
-
-            Invoice invoice = null;
             var paymentProcessor = new InvoicePaymentProcessor(repo);
 
             var payment = new Payment();
@@ -39,8 +36,7 @@ namespace Invoicing.Domain.Tests
             var invoice = new Invoice(repo)
             {
                 Amount = 0,
-                AmountPaid = 0,
-                Payments = null
+                AmountPaid = 0
             };
 
             repo.Add(invoice);
@@ -62,15 +58,9 @@ namespace Invoicing.Domain.Tests
             var invoice = new Invoice(repo)
             {
                 Amount = 10,
-                AmountPaid = 10,
-                Payments = new List<Payment>
-                {
-                    new Payment
-                    {
-                        Amount = 10
-                    }
-                }
+                AmountPaid = 10
             };
+            invoice.AddPayment(new Payment { Amount = 10 });
             repo.Add(invoice);
 
             var paymentProcessor = new InvoicePaymentProcessor(repo);
@@ -89,15 +79,9 @@ namespace Invoicing.Domain.Tests
             var invoice = new Invoice(repo)
             {
                 Amount = 10,
-                AmountPaid = 5,
-                Payments = new List<Payment>
-                {
-                    new Payment
-                    {
-                        Amount = 5
-                    }
-                }
+                AmountPaid = 5
             };
+            invoice.AddPayment(new Payment { Amount = 5 });
             repo.Add(invoice);
 
             var paymentProcessor = new InvoicePaymentProcessor(repo);
@@ -119,8 +103,7 @@ namespace Invoicing.Domain.Tests
             var invoice = new Invoice(repo)
             {
                 Amount = 5,
-                AmountPaid = 0,
-                Payments = new List<Payment>()
+                AmountPaid = 0
             };
             repo.Add(invoice);
 
@@ -143,15 +126,9 @@ namespace Invoicing.Domain.Tests
             var invoice = new Invoice(repo)
             {
                 Amount = 10,
-                AmountPaid = 5,
-                Payments = new List<Payment>
-                {
-                    new Payment
-                    {
-                        Amount = 5
-                    }
-                }
+                AmountPaid = 5
             };
+            invoice.AddPayment(new Payment { Amount = 5 });
             repo.Add(invoice);
 
             var paymentProcessor = new InvoicePaymentProcessor(repo);
@@ -173,9 +150,9 @@ namespace Invoicing.Domain.Tests
             var invoice = new Invoice(repo)
             {
                 Amount = 10,
-                AmountPaid = 0,
-                Payments = new List<Payment>() { new Payment() { Amount = 10 } }
+                AmountPaid = 0
             };
+            invoice.AddPayment(new Payment { Amount = 10 });
             repo.Add(invoice);
 
             var paymentProcessor = new InvoicePaymentProcessor(repo);
@@ -197,15 +174,9 @@ namespace Invoicing.Domain.Tests
             var invoice = new Invoice(repo)
             {
                 Amount = 10,
-                AmountPaid = 5,
-                Payments = new List<Payment>
-                {
-                    new Payment
-                    {
-                        Amount = 5
-                    }
-                }
+                AmountPaid = 5
             };
+            invoice.AddPayment(new Payment { Amount = 5 });
             repo.Add(invoice);
 
             var paymentProcessor = new InvoicePaymentProcessor(repo);
@@ -227,8 +198,7 @@ namespace Invoicing.Domain.Tests
             var invoice = new Invoice(repo)
             {
                 Amount = 10,
-                AmountPaid = 0,
-                Payments = new List<Payment>()
+                AmountPaid = 0
             };
             repo.Add(invoice);
 
