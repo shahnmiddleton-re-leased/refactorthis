@@ -20,18 +20,13 @@ namespace Invoicing.Domain
 
             var inv = _invoiceRepository.Get(payment.Reference);
 
-            string responseMessage;
             if (inv == null)
             {
                 throw new InvalidOperationException("There is no invoice matching this payment");
             }
-            else
-            {
-                responseMessage = inv.AddPayment(payment);
-            }
 
+            var responseMessage = inv.AddPayment(payment);
             inv.Save();
-
             return responseMessage;
         }
     }

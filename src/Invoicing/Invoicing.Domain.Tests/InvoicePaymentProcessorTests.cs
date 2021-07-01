@@ -16,6 +16,17 @@ namespace Invoicing.Domain.Tests
         }
 
         [Theory, DefaultAutoData]
+        public void ProcessPayment_PaymentIsNull_ThrowsArgumentNullException(
+            InvoicePaymentProcessor sut)
+        {
+            Action act = () => sut.ProcessPayment(null);
+
+            act.Should()
+                .Throw<ArgumentNullException>()
+                .And.ParamName.Should().Be("payment");
+        }
+
+        [Theory, DefaultAutoData]
         public void ProcessPayment_Should_ThrowException_When_NoInoiceFoundForPaymentReference(
             Payment payment,
             [Frozen] IInvoiceRepository repository,

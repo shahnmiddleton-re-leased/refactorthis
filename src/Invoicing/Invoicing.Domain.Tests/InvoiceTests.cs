@@ -1,7 +1,10 @@
 ﻿using AutoFixture.Idioms;
+using AutoFixture.NUnit3;
 using FluentAssertions;
 using Invoicing.Domain.Tests.Customizations;
+using NSubstitute;
 using NUnit.Framework;
+using System;
 
 namespace Invoicing.Domain.Tests
 {
@@ -11,6 +14,17 @@ namespace Invoicing.Domain.Tests
         public void StorageQueueIO_VerifyBoundariesForAllConstructors(GuardClauseAssertion guard)
         {
             guard.Verify(typeof(Invoice).GetConstructors());
+        }
+
+        [Theory, DefaultAutoData]
+        public void AddPayment_PaymentIsNull_ThrowsArgumentNullException(
+            Invoice sut)
+        {
+            Action act = () => sut.AddPayment(null);
+
+            act.Should()
+                .Throw<ArgumentNullException>()
+                .And.ParamName.Should().Be("payment");
         }
 
         [Theory, InvoiceAutoData(0, 0)]
@@ -103,6 +117,16 @@ namespace Invoicing.Domain.Tests
             var actual = sut.AddPayment(payment);
 
             actual.Should().Be("invoice is now partially paid");
+        }
+
+        [Theory, DefaultAutoData]
+        public void Save_ShouldSaveOwnStateThroughInvoiceRepository(
+            [Frozen] IInvoiceRepository repository,
+            Invoice sut)
+        {
+            sut.Save();
+
+            repository.Received(1).Update(sut);
         }
 
         public class InvoiceAutoDataAttribute : DefaultAutoDataAttribute
