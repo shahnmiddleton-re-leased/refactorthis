@@ -23,51 +23,27 @@ namespace Invoicing.Domain.Tests
             actual.Should().Be("no payment needed");
         }
 
-        //[Test]
-        //public void AddPayment_Should_ReturnFailureMessage_When_InvoiceAlreadyFullyPaid()
-        //{
-        //    var repo = new InvoiceRepository();
+        [Theory, InvoiceWithPaymentAutoData(10, 10, 10)]
+        public void AddPayment_Should_ReturnFailureMessage_When_InvoiceAlreadyFullyPaid(
+            Payment payment,
+            Invoice sut)
+        {
+            var actual = sut.AddPayment(payment);
 
-        //    var invoice = new Invoice(repo)
-        //    {
-        //        Amount = 10,
-        //        AmountPaid = 10
-        //    };
-        //    invoice.AddPayment(new Payment { Amount = 10 });
-        //    repo.Add(invoice);
+            actual.Should().Be("invoice was already fully paid");
+        }
 
-        //    var paymentProcessor = new InvoicePaymentProcessor(repo);
+        [Theory, InvoiceWithPaymentAutoData(10, 5, 5)]
+        public void AddPayment_Should_ReturnFailureMessage_When_PartialPaymentExistsAndAmountPaidExceedsAmountDue(
+            Payment payment,
+            Invoice sut)
+        {
+            payment.Amount = 6;
 
-        //    var payment = new Payment();
+            var actual = sut.AddPayment(payment);
 
-        //    var result = paymentProcessor.ProcessPayment(payment);
-
-        //    Assert.AreEqual("invoice was already fully paid", result);
-        //}
-
-        //[Test]
-        //public void AddPayment_Should_ReturnFailureMessage_When_PartialPaymentExistsAndAmountPaidExceedsAmountDue()
-        //{
-        //    var repo = new InvoiceRepository();
-        //    var invoice = new Invoice(repo)
-        //    {
-        //        Amount = 10,
-        //        AmountPaid = 5
-        //    };
-        //    invoice.AddPayment(new Payment { Amount = 5 });
-        //    repo.Add(invoice);
-
-        //    var paymentProcessor = new InvoicePaymentProcessor(repo);
-
-        //    var payment = new Payment()
-        //    {
-        //        Amount = 6
-        //    };
-
-        //    var result = paymentProcessor.ProcessPayment(payment);
-
-        //    Assert.AreEqual("the payment is greater than the partial amount remaining", result);
-        //}
+            actual.Should().Be("the payment is greater than the partial amount remaining");
+        }
 
         [Theory, InvoiceAutoData(5, 0)]
         public void AddPayment_Should_ReturnFailureMessage_When_NoPartialPaymentExistsAndAmountPaidExceedsInvoiceAmount(
