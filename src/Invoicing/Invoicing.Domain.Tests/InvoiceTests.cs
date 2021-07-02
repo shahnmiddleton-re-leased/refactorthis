@@ -13,7 +13,7 @@ namespace Invoicing.Domain.Tests
     public class InvoiceTests
     {
         [Theory, DefaultAutoData]
-        public void StorageQueueIO_VerifyBoundariesForAllConstructors(GuardClauseAssertion guard)
+        public void Invoice_VerifyBoundariesForAllConstructors(GuardClauseAssertion guard)
         {
             guard.Verify(typeof(Invoice).GetConstructors());
         }
@@ -137,7 +137,7 @@ namespace Invoicing.Domain.Tests
         }
 
         [Theory, DefaultAutoData]
-        public void AddPayment_FailedValidation_ShouldAddPayment(
+        public void AddPayment_PassedValidation_ShouldAddPayment(
             Payment payment,
             [Frozen] AbstractRuleEngine<AddPaymentCommand> ruleEngine,
             Invoice sut)

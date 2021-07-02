@@ -10,7 +10,7 @@ namespace Invoicing.Domain.Tests
     public class InvoicePaymentProcessorTests
     {
         [Theory, DefaultAutoData]
-        public void StorageQueueIO_VerifyBoundariesForAllConstructors(GuardClauseAssertion guard)
+        public void InvoicePaymentProcessor_VerifyBoundariesForAllConstructors(GuardClauseAssertion guard)
         {
             guard.Verify(typeof(InvoicePaymentProcessor).GetConstructors());
         }
