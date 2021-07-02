@@ -4,7 +4,7 @@ namespace Invoicing.Domain.Rules
 {
     public abstract class AbstractRuleEngine<T>
     {
-        public RuleResult Run(T command)
+        public virtual RuleResult Run(T command)
         {
             foreach (var rule in GetRules())
             {

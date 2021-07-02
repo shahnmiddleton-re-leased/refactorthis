@@ -33,7 +33,7 @@ namespace Invoicing.Domain.Tests.Customizations
                             AmountPaid = _amountPaid
                         };
 
-                        invoice.AddPayment(new Payment { Amount = _paymentAmount });
+                        invoice.Payments.Add(new Payment { Amount = _paymentAmount });
                         return invoice;
                     });
         }

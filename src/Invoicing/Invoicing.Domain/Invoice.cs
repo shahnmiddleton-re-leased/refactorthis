@@ -12,9 +12,11 @@ namespace Invoicing.Domain
         private readonly AbstractRuleEngine<AddPaymentCommand> _addPaymentRules;
         public decimal Amount { get; set; }
         public decimal AmountPaid { get; set; }
+        // TODO: should be readonly IReadOnlyCollection<Payment>, then need refactor the tests to separate classes
         private readonly List<Payment> _payments;
-        public IReadOnlyCollection<Payment> Payments => _payments;
+        public IList<Payment> Payments => _payments;
 
+        // TODO: we can have tests asserting the ruleset injection into Invoice
         public Invoice(IInvoiceRepository repository, AbstractRuleEngine<AddPaymentCommand> addPaymentRules)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));

@@ -1,5 +1,4 @@
 ﻿using Invoicing.Domain.Commands;
-using System.Linq;
 
 namespace Invoicing.Domain.Rules.Invoicing
 {

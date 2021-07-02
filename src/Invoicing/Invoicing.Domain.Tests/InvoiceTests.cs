@@ -1,6 +1,8 @@
 ﻿using AutoFixture.Idioms;
 using AutoFixture.NUnit3;
 using FluentAssertions;
+using Invoicing.Domain.Commands;
+using Invoicing.Domain.Rules;
 using Invoicing.Domain.Tests.Customizations;
 using NSubstitute;
 using NUnit.Framework;
@@ -120,6 +122,36 @@ namespace Invoicing.Domain.Tests
         }
 
         [Theory, DefaultAutoData]
+        public void AddPayment_FailedValidation_ShouldNotAddPayment(
+            Payment payment,
+            [Frozen] AbstractRuleEngine<AddPaymentCommand> ruleEngine,
+            Invoice sut)
+        {
+            var expected = sut.AmountPaid;
+            ruleEngine.Run(Arg.Any<AddPaymentCommand>()).Returns(new RuleResult(false, null));
+
+            sut.AddPayment(payment);
+
+            sut.AmountPaid.Should().Be(expected);
+            sut.Payments.Count.Should().Be(0);
+        }
+
+        [Theory, DefaultAutoData]
+        public void AddPayment_FailedValidation_ShouldAddPayment(
+            Payment payment,
+            [Frozen] AbstractRuleEngine<AddPaymentCommand> ruleEngine,
+            Invoice sut)
+        {
+            var expected = sut.AmountPaid + payment.Amount;
+            ruleEngine.Run(Arg.Any<AddPaymentCommand>()).Returns(new RuleResult(true, null));
+
+            sut.AddPayment(payment);
+
+            sut.AmountPaid.Should().Be(expected);
+            sut.Payments.Count.Should().Be(1);
+        }
+
+        [Theory, DefaultAutoData]
         public void Save_ShouldSaveOwnStateThroughInvoiceRepository(
             [Frozen] IInvoiceRepository repository,
             Invoice sut)
@@ -132,7 +164,8 @@ namespace Invoicing.Domain.Tests
         public class InvoiceAutoDataAttribute : DefaultAutoDataAttribute
         {
             public InvoiceAutoDataAttribute(int amount, int amountPaid)
-                : base(new InvoiceWithoutPaymentCustomization(amount, amountPaid))
+                : base(new InvoiceRuleEngineConcreteCustomization(),
+                      new InvoiceWithoutPaymentCustomization(amount, amountPaid))
             {
             }
         }
@@ -140,7 +173,8 @@ namespace Invoicing.Domain.Tests
         public class InvoiceWithPaymentAutoDataAttribute : DefaultAutoDataAttribute
         {
             public InvoiceWithPaymentAutoDataAttribute(int amount, int amountPaid, int paymentAmount)
-                : base(new InvoiceWithPaymentCustomization(amount, amountPaid, paymentAmount))
+                : base(new InvoiceRuleEngineConcreteCustomization(),
+                      new InvoiceWithPaymentCustomization(amount, amountPaid, paymentAmount))
             {
             }
         }

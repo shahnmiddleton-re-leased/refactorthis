@@ -1,4 +1,5 @@
 ﻿using Invoicing.Domain.Commands;
+using System.Linq;
 
 namespace Invoicing.Domain.Rules.Invoicing
 {
@@ -6,7 +7,8 @@ namespace Invoicing.Domain.Rules.Invoicing
     {
         public bool IsSatisfied(AddPaymentCommand command)
         {
-            return command.Payment.Amount > command.Invoice.Amount;
+            return !command.Invoice.Payments.Any()
+                && command.Payment.Amount > command.Invoice.Amount;
         }
 
         public bool IsValid(AddPaymentCommand command, out string message)
