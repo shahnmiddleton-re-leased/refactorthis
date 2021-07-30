@@ -4,11 +4,11 @@ using RefactorThis.Persistence;
 
 namespace RefactorThis.Domain
 {
-    public class InvoicePaymentProcessor
+    public class InvoicePaymentProcessorService : IInvoicePaymentProcessorService
     {
         private readonly RefactorThisContext _refactorThisContext;
 
-        public InvoicePaymentProcessor(RefactorThisContext refactorThisContext)
+        public InvoicePaymentProcessorService(RefactorThisContext refactorThisContext)
         {
             _refactorThisContext = refactorThisContext;
         }

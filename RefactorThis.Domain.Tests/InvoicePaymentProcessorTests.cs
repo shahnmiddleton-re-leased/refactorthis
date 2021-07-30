@@ -10,51 +10,40 @@ namespace RefactorThis.Domain.Tests
     public class InvoicePaymentProcessorTests
     {
         private DbContextOptions<RefactorThisContext> _dbContextOption = null!;
+        private IInvoicePaymentProcessorService _paymentProcessor = null!;
+        private RefactorThisContext _dbContext = null!;
 
         [SetUp]
         public void SetupBeforeEachTest()
         {
             _dbContextOption = new DbContextOptionsBuilder<RefactorThisContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+             _dbContext = new RefactorThisContext(_dbContextOption);
+             _paymentProcessor = new InvoicePaymentProcessorService(_dbContext);
         }
 
         [Test]
         public void ProcessPayment_Should_ThrowException_When_NoInoiceFoundForPaymentReference()
         {
-            using var ctx = new RefactorThisContext(_dbContextOption);
-            var paymentProcessor = new InvoicePaymentProcessor(ctx);
-
             var payment = new Payment();
-            var failureMessage = "";
-
-            try
-            {
-                var result = paymentProcessor.ProcessPayment(payment);
-            }
-            catch (InvalidOperationException e)
-            {
-                failureMessage = e.Message;
-            }
-
-            Assert.AreEqual("There is no invoice matching this payment", failureMessage);
+            var ex = Assert.Throws<InvalidOperationException>(() => _paymentProcessor.ProcessPayment(payment));
+            Assert.AreEqual("There is no invoice matching this payment", ex?.Message);
         }
 
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_NoPaymentNeeded()
         {
-            using var ctx = new RefactorThisContext(_dbContextOption);
+         
             var invoice = new Invoice();
 
-            ctx.Add(invoice);
-
-            var paymentProcessor = new InvoicePaymentProcessor(ctx);
-
+            _dbContext.Add(invoice);
+            
             var payment = new Payment
             {
                 InvoiceReference = invoice.Reference
             };
 
-            var result = paymentProcessor.ProcessPayment(payment);
+            var result = _paymentProcessor.ProcessPayment(payment);
 
             Assert.AreEqual("no payment needed", result);
         }
@@ -62,7 +51,6 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_InvoiceAlreadyFullyPaid()
         {
-            using var ctx = new RefactorThisContext(_dbContextOption);
             var invoice = new Invoice
             {
                 Amount = 10,
@@ -75,17 +63,15 @@ namespace RefactorThis.Domain.Tests
                     }
                 }
             };
-            ctx.Add(invoice);
-            ctx.SaveChanges();
-
-            var paymentProcessor = new InvoicePaymentProcessor(ctx);
-
+            _dbContext.Add(invoice);
+            _dbContext.SaveChanges();
+            
             var payment = new Payment
             {
                 InvoiceReference = invoice.Reference
             };
 
-            var result = paymentProcessor.ProcessPayment(payment);
+            var result = _paymentProcessor.ProcessPayment(payment);
 
             Assert.AreEqual("invoice was already fully paid", result);
         }
@@ -93,7 +79,6 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_PartialPaymentExistsAndAmountPaidExceedsAmountDue()
         {
-            using var ctx = new RefactorThisContext(_dbContextOption);
             var invoice = new Invoice
             {
                 Amount = 10,
@@ -106,10 +91,9 @@ namespace RefactorThis.Domain.Tests
                     }
                 }
             };
-            ctx.Add(invoice);
-            ctx.SaveChanges();
-
-            var paymentProcessor = new InvoicePaymentProcessor(ctx);
+            _dbContext.Add(invoice);
+            _dbContext.SaveChanges();
+            
 
             var payment = new Payment
             {
@@ -117,7 +101,7 @@ namespace RefactorThis.Domain.Tests
                 Amount = 6
             };
 
-            var result = paymentProcessor.ProcessPayment(payment);
+            var result = _paymentProcessor.ProcessPayment(payment);
 
             Assert.AreEqual("the payment is greater than the partial amount remaining", result);
         }
@@ -125,17 +109,14 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_NoPartialPaymentExistsAndAmountPaidExceedsInvoiceAmount()
         {
-            using var ctx = new RefactorThisContext(_dbContextOption);
             var invoice = new Invoice
             {
                 Amount = 5,
                 AmountPaid = 0,
                 Payments = new List<Payment>()
             };
-            ctx.Add(invoice);
-            ctx.SaveChanges();
-
-            var paymentProcessor = new InvoicePaymentProcessor(ctx);
+            _dbContext.Add(invoice);
+            _dbContext.SaveChanges();
 
             var payment = new Payment()
             {
@@ -143,7 +124,7 @@ namespace RefactorThis.Domain.Tests
                 Amount = 6
             };
 
-            var result = paymentProcessor.ProcessPayment(payment);
+            var result = _paymentProcessor.ProcessPayment(payment);
 
             Assert.AreEqual("the payment is greater than the invoice amount", result);
         }
@@ -151,7 +132,6 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFullyPaidMessage_When_PartialPaymentExistsAndAmountPaidEqualsAmountDue()
         {
-            using var ctx = new RefactorThisContext(_dbContextOption);
             var invoice = new Invoice
             {
                 Amount = 10,
@@ -164,10 +144,8 @@ namespace RefactorThis.Domain.Tests
                     }
                 }
             };
-            ctx.Add(invoice);
-            ctx.SaveChanges();
-
-            var paymentProcessor = new InvoicePaymentProcessor(ctx);
+            _dbContext.Add(invoice);
+            _dbContext.SaveChanges();
 
             var payment = new Payment
             {
@@ -175,7 +153,7 @@ namespace RefactorThis.Domain.Tests
                 Amount = 5
             };
 
-            var result = paymentProcessor.ProcessPayment(payment);
+            var result = _paymentProcessor.ProcessPayment(payment);
 
             Assert.AreEqual("final partial payment received, invoice is now fully paid", result);
         }
@@ -183,17 +161,14 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFullyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidEqualsInvoiceAmount()
         {
-            using var ctx = new RefactorThisContext(_dbContextOption);
             var invoice = new Invoice
             {
                 Amount = 10,
                 AmountPaid = 0,
                 Payments = new List<Payment> { new() { Amount = 10 } }
             };
-            ctx.Add(invoice);
-            ctx.SaveChanges();
-
-            var paymentProcessor = new InvoicePaymentProcessor(ctx);
+            _dbContext.Add(invoice);
+            _dbContext.SaveChanges();
 
             var payment = new Payment
             {
@@ -201,7 +176,7 @@ namespace RefactorThis.Domain.Tests
                 Amount = 10
             };
 
-            var result = paymentProcessor.ProcessPayment(payment);
+            var result = _paymentProcessor.ProcessPayment(payment);
 
             Assert.AreEqual("invoice was already fully paid", result);
         }
@@ -209,7 +184,6 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_PartialPaymentExistsAndAmountPaidIsLessThanAmountDue()
         {
-            using var ctx = new RefactorThisContext(_dbContextOption);
             var invoice = new Invoice
             {
                 Amount = 10,
@@ -222,10 +196,8 @@ namespace RefactorThis.Domain.Tests
                     }
                 }
             };
-            ctx.Add(invoice);
-            ctx.SaveChanges();
-
-            var paymentProcessor = new InvoicePaymentProcessor(ctx);
+            _dbContext.Add(invoice);
+            _dbContext.SaveChanges();
 
             var payment = new Payment
             {
@@ -233,7 +205,7 @@ namespace RefactorThis.Domain.Tests
                 Amount = 1
             };
 
-            var result = paymentProcessor.ProcessPayment(payment);
+            var result = _paymentProcessor.ProcessPayment(payment);
 
             Assert.AreEqual("another partial payment received, still not fully paid", result);
         }
@@ -241,17 +213,14 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidIsLessThanInvoiceAmount()
         {
-            using var ctx = new RefactorThisContext(_dbContextOption);
             var invoice = new Invoice
             {
                 Amount = 10,
                 AmountPaid = 0,
                 Payments = new List<Payment>()
             };
-            ctx.Add(invoice);
-            ctx.SaveChanges();
-
-            var paymentProcessor = new InvoicePaymentProcessor(ctx);
+            _dbContext.Add(invoice);
+            _dbContext.SaveChanges();
 
             var payment = new Payment
             {
@@ -259,7 +228,7 @@ namespace RefactorThis.Domain.Tests
                 Amount = 1
             };
 
-            var result = paymentProcessor.ProcessPayment(payment);
+            var result = _paymentProcessor.ProcessPayment(payment);
 
             Assert.AreEqual("invoice is now partially paid", result);
         }
