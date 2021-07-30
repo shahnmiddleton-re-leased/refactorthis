@@ -17,9 +17,6 @@ namespace RefactorThis.Domain
         public async Task<string> ProcessPaymentAsync(Payment payment)
         {
             var inv = await _refactorThisContext.Invoices.FindAsync(payment.InvoiceReference);
-
-            var responseMessage = string.Empty;
-
             if (inv == null)
             {
                 throw new InvalidOperationException("There is no invoice matching this payment");
@@ -27,67 +24,34 @@ namespace RefactorThis.Domain
 
             if (inv.Amount == 0)
             {
-                if (!inv.Payments.Any())
-                {
-                    responseMessage = "no payment needed";
-                }
-                else
-                {
-                    throw new InvalidOperationException("The invoice is in an invalid state, it has an amount of 0 and it has payments.");
-                }
+                return inv.Payments.Any()
+                    ? throw new InvalidOperationException(
+                        "The invoice is in an invalid state, it has an amount of 0 and it has payments.")
+                    : "no payment needed";
             }
-            else
+            
+            var hasPreviousPayment = inv.Payments.Any();
+            var remainingToPay = inv.Amount - inv.Payments.Sum(x => x.Amount);
+            if (inv.Amount == inv.Payments.Sum(x => x.Amount))
             {
-                if (inv.Payments.Any())
-                {
-                    if (inv.Payments.Sum(x => x.Amount) != 0 && inv.Amount == inv.Payments.Sum(x => x.Amount))
-                    {
-                        responseMessage = "invoice was already fully paid";
-                    }
-                    else if (inv.Payments.Sum(x => x.Amount) != 0 && payment.Amount > (inv.Amount - inv.AmountPaid))
-                    {
-                        responseMessage = "the payment is greater than the partial amount remaining";
-                    }
-                    else
-                    {
-                        if ((inv.Amount - inv.AmountPaid) == payment.Amount)
-                        {
-                            inv.AmountPaid += payment.Amount;
-                            inv.Payments.Add(payment);
-                            responseMessage = "final partial payment received, invoice is now fully paid";
-                        }
-                        else
-                        {
-                            inv.AmountPaid += payment.Amount;
-                            inv.Payments.Add(payment);
-                            responseMessage = "another partial payment received, still not fully paid";
-                        }
-                    }
-                }
-                else
-                {
-                    if (payment.Amount > inv.Amount)
-                    {
-                        responseMessage = "the payment is greater than the invoice amount";
-                    }
-                    else if (inv.Amount == payment.Amount)
-                    {
-                        inv.AmountPaid = payment.Amount;
-                        inv.Payments.Add(payment);
-                        responseMessage = "invoice is now fully paid";
-                    }
-                    else
-                    {
-                        inv.AmountPaid = payment.Amount;
-                        inv.Payments.Add(payment);
-                        responseMessage = "invoice is now partially paid";
-                    }
-                }
+                return "invoice was already fully paid";
             }
 
+            if (payment.Amount > remainingToPay)
+            {
+                return hasPreviousPayment ? "the payment is greater than the partial amount remaining" : "the payment is greater than the invoice amount";
+            }
+
+            inv.Payments.Add(payment);
             await _refactorThisContext.SaveChangesAsync();
 
-            return responseMessage;
+            return (remainingToPay == payment.Amount, hasPreviousPayment) switch
+            {
+                (true, true) => "final partial payment received, invoice is now fully paid",
+                (true, false) => "invoice is now fully paid",
+                (false, true) => "another partial payment received, still not fully paid",
+                (false, false) => "invoice is now partially paid",
+            };
         }
     }
 }
