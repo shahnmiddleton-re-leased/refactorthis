@@ -1,9 +1,10 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using RefactorThis.Domain.InternationalizationService;
 using RefactorThis.Persistence;
 
-namespace RefactorThis.Domain
+namespace RefactorThis.Domain.InvoicePaymentProcessorService
 {
     public class InvoicePaymentProcessorService : IInvoicePaymentProcessorService
     {

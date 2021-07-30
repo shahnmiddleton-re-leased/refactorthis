@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using RefactorThis.Persistence;
 
-namespace RefactorThis.Domain
+namespace RefactorThis.Domain.InvoicePaymentProcessorService
 {
     public interface IInvoicePaymentProcessorService
     {

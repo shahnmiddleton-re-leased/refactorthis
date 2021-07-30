@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using RefactorThis.Domain.InternationalizationService;
+using RefactorThis.Domain.InvoicePaymentProcessorService;
 using RefactorThis.Persistence;
 using SpecLight;
 
@@ -28,8 +30,8 @@ namespace RefactorThis.Domain.Tests
             _dbContextOption = new DbContextOptionsBuilder<RefactorThisContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
             _dbContext = new RefactorThisContext(_dbContextOption);
-            _internationalizationService = new InternationalizationService();
-            _paymentProcessor = new InvoicePaymentProcessorService(_dbContext, _internationalizationService);
+            _internationalizationService = new InternationalizationService.InternationalizationService();
+            _paymentProcessor = new InvoicePaymentProcessorService.InvoicePaymentProcessorService(_dbContext, _internationalizationService);
         }
 
         [Test]

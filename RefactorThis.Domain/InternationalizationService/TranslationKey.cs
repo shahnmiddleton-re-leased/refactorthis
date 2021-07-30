@@ -1,4 +1,4 @@
-namespace RefactorThis.Domain
+namespace RefactorThis.Domain.InternationalizationService
 {
     public abstract record TranslationKey(string Key);
 
