@@ -24,7 +24,7 @@ namespace RefactorThis.Domain.Tests
         }
 
         [Test]
-        public void ProcessPayment_Should_ThrowException_When_NoInoiceFoundForPaymentReference()
+        public void ProcessPayment_Should_ThrowException_When_NoInvoiceFoundForPaymentReference()
         {
             var payment = new Payment();
             var ex = Assert.ThrowsAsync<InvalidOperationException>(() => _paymentProcessor.ProcessPaymentAsync(payment));
