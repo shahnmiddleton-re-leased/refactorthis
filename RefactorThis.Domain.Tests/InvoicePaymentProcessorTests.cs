@@ -13,6 +13,7 @@ namespace RefactorThis.Domain.Tests
         private DbContextOptions<RefactorThisContext> _dbContextOption = null!;
         private IInvoicePaymentProcessorService _paymentProcessor = null!;
         private RefactorThisContext _dbContext = null!;
+        private IInternationalizationService _internationalizationService = null!;
 
         [SetUp]
         public void SetupBeforeEachTest()
@@ -20,7 +21,8 @@ namespace RefactorThis.Domain.Tests
             _dbContextOption = new DbContextOptionsBuilder<RefactorThisContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
              _dbContext = new RefactorThisContext(_dbContextOption);
-             _paymentProcessor = new InvoicePaymentProcessorService(_dbContext);
+             _internationalizationService = new InternationalizationService();
+             _paymentProcessor = new InvoicePaymentProcessorService(_dbContext, _internationalizationService);
         }
 
         [Test]
@@ -28,7 +30,7 @@ namespace RefactorThis.Domain.Tests
         {
             var payment = new Payment();
             var ex = Assert.ThrowsAsync<InvalidOperationException>(() => _paymentProcessor.ProcessPaymentAsync(payment));
-            Assert.AreEqual("There is no invoice matching this payment", ex?.Message);
+            Assert.AreEqual(_internationalizationService.GetTranslationFromKey(new InvoiceNotFound()), ex?.Message);
         }
 
         [Test]
@@ -45,7 +47,7 @@ namespace RefactorThis.Domain.Tests
 
             var result = await _paymentProcessor.ProcessPaymentAsync(payment);
 
-            Assert.AreEqual("no payment needed", result);
+            Assert.AreEqual(_internationalizationService.GetTranslationFromKey(new InvoiceNoPaymentNeeded()), result);
         }
 
         [Test]
@@ -72,7 +74,7 @@ namespace RefactorThis.Domain.Tests
 
             var result = await _paymentProcessor.ProcessPaymentAsync(payment);
 
-            Assert.AreEqual("invoice was already fully paid", result);
+            Assert.AreEqual(_internationalizationService.GetTranslationFromKey(new InvoiceAlreadyFullyPaid()), result);
         }
 
         [Test]
@@ -101,7 +103,7 @@ namespace RefactorThis.Domain.Tests
 
             var result = await _paymentProcessor.ProcessPaymentAsync(payment);
 
-            Assert.AreEqual("the payment is greater than the partial amount remaining", result);
+            Assert.AreEqual(_internationalizationService.GetTranslationFromKey(new InvoicePartialPaymentTooBig()), result);
         }
 
         [Test]
@@ -123,7 +125,7 @@ namespace RefactorThis.Domain.Tests
 
             var result = await _paymentProcessor.ProcessPaymentAsync(payment);
 
-            Assert.AreEqual("the payment is greater than the invoice amount", result);
+            Assert.AreEqual(_internationalizationService.GetTranslationFromKey(new InvoicePaymentTooBig()), result);
         }
 
         [Test]
@@ -151,7 +153,7 @@ namespace RefactorThis.Domain.Tests
 
             var result = await _paymentProcessor.ProcessPaymentAsync(payment);
 
-            Assert.AreEqual("final partial payment received, invoice is now fully paid", result);
+            Assert.AreEqual(_internationalizationService.GetTranslationFromKey(new InvoiceFinalPaymentPaid()), result);
         }
 
         [Test]
@@ -173,7 +175,7 @@ namespace RefactorThis.Domain.Tests
 
             var result = await _paymentProcessor.ProcessPaymentAsync(payment);
 
-            Assert.AreEqual("invoice was already fully paid", result);
+            Assert.AreEqual(_internationalizationService.GetTranslationFromKey(new InvoiceAlreadyFullyPaid()), result);
         }
 
         [Test]
@@ -201,7 +203,7 @@ namespace RefactorThis.Domain.Tests
 
             var result = await _paymentProcessor.ProcessPaymentAsync(payment);
 
-            Assert.AreEqual("another partial payment received, still not fully paid", result);
+            Assert.AreEqual(_internationalizationService.GetTranslationFromKey(new InvoicePartialPaymentReceived()), result);
         }
 
         [Test]
@@ -223,7 +225,7 @@ namespace RefactorThis.Domain.Tests
 
             var result = await _paymentProcessor.ProcessPaymentAsync(payment);
 
-            Assert.AreEqual("invoice is now partially paid", result);
+            Assert.AreEqual(_internationalizationService.GetTranslationFromKey(new InvoicePartiallyPaid()), result);
         }
     }
 }
