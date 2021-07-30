@@ -6,6 +6,6 @@
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\RefactorThis.Persistence\RefactorThis.Persistence.csproj" />
+		<ProjectReference Include="..\RefactorThis.Persistence\RefactorThis.Persistence.csproj" />
 	</ItemGroup>
 </Project>

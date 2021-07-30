@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using RefactorThis.Domain.InternationalizationService;
-using RefactorThis.Persistence;
 
 namespace RefactorThis.Domain.Tests
 {

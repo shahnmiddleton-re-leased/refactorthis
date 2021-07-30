@@ -3,7 +3,7 @@ using System.Resources;
 
 namespace RefactorThis.Domain.InternationalizationService
 {
-    public class InternationalizationService: IInternationalizationService
+    public class InternationalizationService : IInternationalizationService
     {
         private readonly ResourceManager _manager;
 

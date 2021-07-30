@@ -25,16 +25,18 @@ namespace RefactorThis.Domain.InvoicePaymentProcessorService
                 throw new InvalidOperationException(_internationalizationService.GetTranslationFromKey(new InvoiceNotFound()));
             }
 
+            var hasPreviousPayment = inv.Payments.Any();
+            var remainingToPay = inv.Amount - inv.Payments.Sum(x => x.Amount);
+            var isFullPayment = remainingToPay == payment.Amount;
+
             if (inv.Amount == 0)
             {
-                return inv.Payments.Any()
+                return hasPreviousPayment
                     ? throw new InvalidOperationException(_internationalizationService.GetTranslationFromKey(new InvoiceInvalidState()))
                     : _internationalizationService.GetTranslationFromKey(new InvoiceNoPaymentNeeded());
             }
 
-            var hasPreviousPayment = inv.Payments.Any();
-            var remainingToPay = inv.Amount - inv.Payments.Sum(x => x.Amount);
-            if (inv.Amount == inv.Payments.Sum(x => x.Amount))
+            if (remainingToPay == 0)
             {
                 return _internationalizationService.GetTranslationFromKey(new InvoiceAlreadyFullyPaid());
             }
@@ -47,7 +49,7 @@ namespace RefactorThis.Domain.InvoicePaymentProcessorService
             inv.Payments.Add(payment);
             await _refactorThisContext.SaveChangesAsync();
 
-            return _internationalizationService.GetTranslationFromKey((remainingToPay == payment.Amount, hasPreviousPayment) switch
+            return _internationalizationService.GetTranslationFromKey((isFullPayment, hasPreviousPayment) switch
             {
                 (true, true) => new InvoiceFinalPaymentPaid(),
                 (true, false) => new InvoiceFullyPaid(),

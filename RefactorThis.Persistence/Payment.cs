@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RefactorThis.Persistence
 {
-	public class Payment
+    public class Payment
     {
         [Key]
         [Required]
