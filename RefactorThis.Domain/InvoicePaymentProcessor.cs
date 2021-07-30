@@ -6,16 +6,16 @@ namespace RefactorThis.Domain
 {
     public class InvoicePaymentProcessor
     {
-        private readonly InvoiceRepository _invoiceRepository;
+        private readonly RefactorThisContext _refactorThisContext;
 
-        public InvoicePaymentProcessor(InvoiceRepository invoiceRepository)
+        public InvoicePaymentProcessor(RefactorThisContext refactorThisContext)
         {
-            _invoiceRepository = invoiceRepository;
+            _refactorThisContext = refactorThisContext;
         }
 
         public string ProcessPayment(Payment payment)
         {
-            var inv = _invoiceRepository.GetInvoice(payment.Reference);
+            var inv = _refactorThisContext.Invoices.Find(payment.InvoiceReference);
 
             var responseMessage = string.Empty;
 
@@ -85,8 +85,8 @@ namespace RefactorThis.Domain
                     }
                 }
             }
-
-            inv.Save();
+            
+            _refactorThisContext.SaveChanges();
 
             return responseMessage;
         }

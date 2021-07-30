@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using RefactorThis.Persistence;
 
@@ -8,12 +9,20 @@ namespace RefactorThis.Domain.Tests
     [TestFixture]
     public class InvoicePaymentProcessorTests
     {
+        private DbContextOptions<RefactorThisContext> _dbContextOption = null!;
+
+        [SetUp]
+        public void SetupBeforeEachTest()
+        {
+            _dbContextOption = new DbContextOptionsBuilder<RefactorThisContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        }
+
         [Test]
         public void ProcessPayment_Should_ThrowException_When_NoInoiceFoundForPaymentReference()
         {
-            var repo = new InvoiceRepository();
-            
-            var paymentProcessor = new InvoicePaymentProcessor(repo);
+            using var ctx = new RefactorThisContext(_dbContextOption);
+            var paymentProcessor = new InvoicePaymentProcessor(ctx);
 
             var payment = new Payment();
             var failureMessage = "";
@@ -33,20 +42,17 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_NoPaymentNeeded()
         {
-            var repo = new InvoiceRepository();
+            using var ctx = new RefactorThisContext(_dbContextOption);
+            var invoice = new Invoice();
 
-            var invoice = new Invoice(repo)
+            ctx.Add(invoice);
+
+            var paymentProcessor = new InvoicePaymentProcessor(ctx);
+
+            var payment = new Payment
             {
-                Amount = 0,
-                AmountPaid = 0,
-                Payments = null
+                InvoiceReference = invoice.Reference
             };
-
-            repo.Add(invoice);
-
-            var paymentProcessor = new InvoicePaymentProcessor(repo);
-
-            var payment = new Payment();
 
             var result = paymentProcessor.ProcessPayment(payment);
 
@@ -56,25 +62,28 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_InvoiceAlreadyFullyPaid()
         {
-            var repo = new InvoiceRepository();
-
-            var invoice = new Invoice(repo)
+            using var ctx = new RefactorThisContext(_dbContextOption);
+            var invoice = new Invoice
             {
                 Amount = 10,
                 AmountPaid = 10,
                 Payments = new List<Payment>
                 {
-                    new Payment
+                    new()
                     {
                         Amount = 10
                     }
                 }
             };
-            repo.Add(invoice);
+            ctx.Add(invoice);
+            ctx.SaveChanges();
 
-            var paymentProcessor = new InvoicePaymentProcessor(repo);
+            var paymentProcessor = new InvoicePaymentProcessor(ctx);
 
-            var payment = new Payment();
+            var payment = new Payment
+            {
+                InvoiceReference = invoice.Reference
+            };
 
             var result = paymentProcessor.ProcessPayment(payment);
 
@@ -84,25 +93,27 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_PartialPaymentExistsAndAmountPaidExceedsAmountDue()
         {
-            var repo = new InvoiceRepository();
-            var invoice = new Invoice(repo)
+            using var ctx = new RefactorThisContext(_dbContextOption);
+            var invoice = new Invoice
             {
                 Amount = 10,
                 AmountPaid = 5,
                 Payments = new List<Payment>
                 {
-                    new Payment
+                    new()
                     {
                         Amount = 5
                     }
                 }
             };
-            repo.Add(invoice);
+            ctx.Add(invoice);
+            ctx.SaveChanges();
 
-            var paymentProcessor = new InvoicePaymentProcessor(repo);
+            var paymentProcessor = new InvoicePaymentProcessor(ctx);
 
-            var payment = new Payment()
+            var payment = new Payment
             {
+                InvoiceReference = invoice.Reference,
                 Amount = 6
             };
 
@@ -114,19 +125,21 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_NoPartialPaymentExistsAndAmountPaidExceedsInvoiceAmount()
         {
-            var repo = new InvoiceRepository();
-            var invoice = new Invoice(repo)
+            using var ctx = new RefactorThisContext(_dbContextOption);
+            var invoice = new Invoice
             {
                 Amount = 5,
                 AmountPaid = 0,
                 Payments = new List<Payment>()
             };
-            repo.Add(invoice);
+            ctx.Add(invoice);
+            ctx.SaveChanges();
 
-            var paymentProcessor = new InvoicePaymentProcessor(repo);
+            var paymentProcessor = new InvoicePaymentProcessor(ctx);
 
             var payment = new Payment()
             {
+                InvoiceReference = invoice.Reference,
                 Amount = 6
             };
 
@@ -138,8 +151,8 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFullyPaidMessage_When_PartialPaymentExistsAndAmountPaidEqualsAmountDue()
         {
-            var repo = new InvoiceRepository();
-            var invoice = new Invoice(repo)
+            using var ctx = new RefactorThisContext(_dbContextOption);
+            var invoice = new Invoice
             {
                 Amount = 10,
                 AmountPaid = 5,
@@ -151,12 +164,14 @@ namespace RefactorThis.Domain.Tests
                     }
                 }
             };
-            repo.Add(invoice);
+            ctx.Add(invoice);
+            ctx.SaveChanges();
 
-            var paymentProcessor = new InvoicePaymentProcessor(repo);
+            var paymentProcessor = new InvoicePaymentProcessor(ctx);
 
-            var payment = new Payment()
+            var payment = new Payment
             {
+                InvoiceReference = invoice.Reference,
                 Amount = 5
             };
 
@@ -168,19 +183,21 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFullyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidEqualsInvoiceAmount()
         {
-            var repo = new InvoiceRepository();
-            var invoice = new Invoice(repo)
+            using var ctx = new RefactorThisContext(_dbContextOption);
+            var invoice = new Invoice
             {
                 Amount = 10,
                 AmountPaid = 0,
-                Payments = new List<Payment>() { new Payment() { Amount = 10 } }
+                Payments = new List<Payment> { new() { Amount = 10 } }
             };
-            repo.Add(invoice);
+            ctx.Add(invoice);
+            ctx.SaveChanges();
 
-            var paymentProcessor = new InvoicePaymentProcessor(repo);
+            var paymentProcessor = new InvoicePaymentProcessor(ctx);
 
-            var payment = new Payment()
+            var payment = new Payment
             {
+                InvoiceReference = invoice.Reference,
                 Amount = 10
             };
 
@@ -192,25 +209,27 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_PartialPaymentExistsAndAmountPaidIsLessThanAmountDue()
         {
-            var repo = new InvoiceRepository();
-            var invoice = new Invoice(repo)
+            using var ctx = new RefactorThisContext(_dbContextOption);
+            var invoice = new Invoice
             {
                 Amount = 10,
                 AmountPaid = 5,
                 Payments = new List<Payment>
                 {
-                    new Payment
+                    new()
                     {
                         Amount = 5
                     }
                 }
             };
-            repo.Add(invoice);
+            ctx.Add(invoice);
+            ctx.SaveChanges();
 
-            var paymentProcessor = new InvoicePaymentProcessor(repo);
+            var paymentProcessor = new InvoicePaymentProcessor(ctx);
 
-            var payment = new Payment()
+            var payment = new Payment
             {
+                InvoiceReference = invoice.Reference,
                 Amount = 1
             };
 
@@ -222,19 +241,21 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidIsLessThanInvoiceAmount()
         {
-            var repo = new InvoiceRepository();
-            var invoice = new Invoice(repo)
+            using var ctx = new RefactorThisContext(_dbContextOption);
+            var invoice = new Invoice
             {
                 Amount = 10,
                 AmountPaid = 0,
                 Payments = new List<Payment>()
             };
-            repo.Add(invoice);
+            ctx.Add(invoice);
+            ctx.SaveChanges();
 
-            var paymentProcessor = new InvoicePaymentProcessor(repo);
+            var paymentProcessor = new InvoicePaymentProcessor(ctx);
 
-            var payment = new Payment()
+            var payment = new Payment
             {
+                InvoiceReference = invoice.Reference,
                 Amount = 1
             };
 
