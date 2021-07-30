@@ -18,7 +18,6 @@ namespace RefactorThis.Persistence
         public Guid Reference { get; set; }
 
         public decimal Amount { get; set; }
-        public decimal AmountPaid { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }
     }
 }

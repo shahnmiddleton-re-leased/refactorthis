@@ -54,7 +54,6 @@ namespace RefactorThis.Domain.Tests
             var invoice = new Invoice
             {
                 Amount = 10,
-                AmountPaid = 10,
                 Payments = new List<Payment>
                 {
                     new()
@@ -82,7 +81,6 @@ namespace RefactorThis.Domain.Tests
             var invoice = new Invoice
             {
                 Amount = 10,
-                AmountPaid = 5,
                 Payments = new List<Payment>
                 {
                     new()
@@ -112,7 +110,6 @@ namespace RefactorThis.Domain.Tests
             var invoice = new Invoice
             {
                 Amount = 5,
-                AmountPaid = 0,
                 Payments = new List<Payment>()
             };
             _dbContext.Add(invoice);
@@ -135,7 +132,6 @@ namespace RefactorThis.Domain.Tests
             var invoice = new Invoice
             {
                 Amount = 10,
-                AmountPaid = 5,
                 Payments = new List<Payment>
                 {
                     new Payment
@@ -164,7 +160,6 @@ namespace RefactorThis.Domain.Tests
             var invoice = new Invoice
             {
                 Amount = 10,
-                AmountPaid = 0,
                 Payments = new List<Payment> { new() { Amount = 10 } }
             };
             _dbContext.Add(invoice);
@@ -187,7 +182,6 @@ namespace RefactorThis.Domain.Tests
             var invoice = new Invoice
             {
                 Amount = 10,
-                AmountPaid = 5,
                 Payments = new List<Payment>
                 {
                     new()
@@ -216,7 +210,6 @@ namespace RefactorThis.Domain.Tests
             var invoice = new Invoice
             {
                 Amount = 10,
-                AmountPaid = 0,
                 Payments = new List<Payment>()
             };
             _dbContext.Add(invoice);
