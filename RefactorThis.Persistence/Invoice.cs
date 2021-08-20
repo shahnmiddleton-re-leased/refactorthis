@@ -1,11 +1,12 @@
+using RefactorThis.Persistence.Payment;
 using System.Collections.Generic;
 
 namespace RefactorThis.Persistence
 {
 	public class Invoice
 	{
-		private readonly InvoiceRepository _repository;
-		public Invoice( InvoiceRepository repository )
+		private readonly IInvoiceRepository _repository;
+		public Invoice(IInvoiceRepository repository )
 		{
 			_repository = repository;
 		}
@@ -17,6 +18,6 @@ namespace RefactorThis.Persistence
 
 		public decimal Amount { get; set; }
 		public decimal AmountPaid { get; set; }
-		public List<Payment> Payments { get; set; }
+		public List<IPayment> Payments { get; set; }
 	}
 }
