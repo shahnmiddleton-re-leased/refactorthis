@@ -15,10 +15,10 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ThrowException_When_NoInvoiceFoundForPaymentReference( )
 		{
-			var repo = new InvoiceRepository();
-			var validator = new PaymentValidator();
-            var invoiceService = new InvoiceService(repo, validator);
-			IInvoicePaymentProcessor paymentProcessor = new InvoicePaymentProcessor(invoiceService);
+			var repo = new InvoiceRepository( );
+			var validator = new PaymentValidator( );
+            var invoiceService = new InvoiceService( repo, validator );
+			IInvoicePaymentProcessor paymentProcessor = new InvoicePaymentProcessor( invoiceService );
 
 			var payment = new Payment( );
 			var failureMessage = "";
@@ -36,14 +36,14 @@ namespace RefactorThis.Domain.Tests
 		}
 
         [Test]
-        public void ProcessPayment_Should_ThrowException_When_InvoiceIsInAnInvalidState()
+        public void ProcessPayment_Should_ThrowException_When_InvoiceIsInAnInvalidState( )
         {
-            var repo = new InvoiceRepository();
-            var validator = new PaymentValidator();
-            var invoiceService = new InvoiceService(repo, validator);
-            IInvoicePaymentProcessor paymentProcessor = new InvoicePaymentProcessor(invoiceService);
+            var repo = new InvoiceRepository( );
+            var validator = new PaymentValidator( );
+            var invoiceService = new InvoiceService( repo, validator );
+            IInvoicePaymentProcessor paymentProcessor = new InvoicePaymentProcessor( invoiceService );
 
-            var invoice = new Invoice()
+            var invoice = new Invoice( )
             {
                 Amount = 0,
                 AmountPaid = 0,
@@ -56,31 +56,31 @@ namespace RefactorThis.Domain.Tests
                 }
 			};
 
-            repo.Add(invoice);
+            repo.Add( invoice );
 
-			var payment = new Payment();
+			var payment = new Payment( );
             var failureMessage = "";
 
             try
             {
-                var result = paymentProcessor.ProcessPayment(payment);
+                var result = paymentProcessor.ProcessPayment( payment );
             }
-            catch (InvalidOperationException e)
+            catch ( InvalidOperationException e )
             {
                 failureMessage = e.Message;
             }
 
-            Assert.AreEqual("The invoice is in an invalid state, it has an amount of 0 and it has payments.", failureMessage);
+            Assert.AreEqual( "The invoice is in an invalid state, it has an amount of 0 and it has payments.", failureMessage );
         }
 
 		[Test]
 		public void ProcessPayment_Should_ReturnFailureMessage_When_NoPaymentNeeded( )
 		{
-            var repo = new InvoiceRepository();
-            var validator = new PaymentValidator();
-            var invoiceService = new InvoiceService(repo, validator);
+            var repo = new InvoiceRepository( );
+            var validator = new PaymentValidator( );
+            var invoiceService = new InvoiceService( repo, validator );
 
-			var invoice = new Invoice()
+			var invoice = new Invoice
 			{
 				Amount = 0,
 				AmountPaid = 0,
@@ -101,11 +101,11 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFailureMessage_When_InvoiceAlreadyFullyPaid( )
 		{
-            var repo = new InvoiceRepository();
-            var validator = new PaymentValidator();
-            var invoiceService = new InvoiceService(repo, validator);
+            var repo = new InvoiceRepository( );
+            var validator = new PaymentValidator( );
+            var invoiceService = new InvoiceService( repo, validator );
 			
-            var invoice = new Invoice()
+            var invoice = new Invoice
 			{
 				Amount = 10,
 				AmountPaid = 10,
@@ -131,11 +131,11 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFailureMessage_When_PartialPaymentExistsAndAmountPaidExceedsAmountDue( )
 		{
-            var repo = new InvoiceRepository();
-            var validator = new PaymentValidator();
-            var invoiceService = new InvoiceService(repo, validator);
+            var repo = new InvoiceRepository( );
+            var validator = new PaymentValidator( );
+            var invoiceService = new InvoiceService( repo, validator );
 
-            var invoice = new Invoice()
+            var invoice = new Invoice
 			{
 				Amount = 10,
 				AmountPaid = 5,
@@ -151,7 +151,7 @@ namespace RefactorThis.Domain.Tests
 
 			IInvoicePaymentProcessor paymentProcessor = new InvoicePaymentProcessor( invoiceService );
 
-			var payment = new Payment( )
+			var payment = new Payment
 			{
 				Amount = 6
 			};
@@ -164,11 +164,11 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFailureMessage_When_NoPartialPaymentExistsAndAmountPaidExceedsInvoiceAmount( )
 		{
-            var repo = new InvoiceRepository();
-            var validator = new PaymentValidator();
-            var invoiceService = new InvoiceService(repo, validator);
+            var repo = new InvoiceRepository( );
+            var validator = new PaymentValidator( );
+            var invoiceService = new InvoiceService( repo, validator );
 
-            var invoice = new Invoice()
+            var invoice = new Invoice
 			{
 				Amount = 5,
 				AmountPaid = 0,
@@ -178,7 +178,7 @@ namespace RefactorThis.Domain.Tests
 
 			IInvoicePaymentProcessor paymentProcessor = new InvoicePaymentProcessor( invoiceService );
 
-			var payment = new Payment( )
+			var payment = new Payment
 			{
 				Amount = 6
 			};
@@ -191,11 +191,11 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFullyPaidMessage_When_PartialPaymentExistsAndAmountPaidEqualsAmountDue( )
 		{
-            var repo = new InvoiceRepository();
-            var validator = new PaymentValidator();
-            var invoiceService = new InvoiceService(repo, validator);
+            var repo = new InvoiceRepository( );
+            var validator = new PaymentValidator( );
+            var invoiceService = new InvoiceService( repo, validator );
 
-            var invoice = new Invoice()
+            var invoice = new Invoice
 			{
 				Amount = 10,
 				AmountPaid = 5,
@@ -211,7 +211,7 @@ namespace RefactorThis.Domain.Tests
 
 			IInvoicePaymentProcessor paymentProcessor = new InvoicePaymentProcessor( invoiceService );
 
-			var payment = new Payment( )
+			var payment = new Payment
 			{
 				Amount = 5
 			};
@@ -224,11 +224,11 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFullyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidEqualsInvoiceAmount( )
 		{
-            var repo = new InvoiceRepository();
-            var validator = new PaymentValidator();
-            var invoiceService = new InvoiceService(repo, validator);
+            var repo = new InvoiceRepository( );
+            var validator = new PaymentValidator( );
+            var invoiceService = new InvoiceService( repo, validator );
 
-            var invoice = new Invoice()
+            var invoice = new Invoice
 			{
 				Amount = 10,
 				AmountPaid = 0,
@@ -238,7 +238,7 @@ namespace RefactorThis.Domain.Tests
 
 			IInvoicePaymentProcessor paymentProcessor = new InvoicePaymentProcessor( invoiceService );
 
-			var payment = new Payment( )
+			var payment = new Payment
 			{
 				Amount = 10
 			};
@@ -251,11 +251,11 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_PartialPaymentExistsAndAmountPaidIsLessThanAmountDue( )
 		{
-            var repo = new InvoiceRepository();
-            var validator = new PaymentValidator();
-            var invoiceService = new InvoiceService(repo, validator);
+            var repo = new InvoiceRepository( );
+            var validator = new PaymentValidator( );
+            var invoiceService = new InvoiceService( repo, validator );
 
-            var invoice = new Invoice()
+            var invoice = new Invoice
 			{
 				Amount = 10,
 				AmountPaid = 5,
@@ -271,7 +271,7 @@ namespace RefactorThis.Domain.Tests
 
 			IInvoicePaymentProcessor paymentProcessor = new InvoicePaymentProcessor( invoiceService );
 
-			var payment = new Payment( )
+			var payment = new Payment
 			{
 				Amount = 1
 			};
@@ -279,17 +279,17 @@ namespace RefactorThis.Domain.Tests
 			var result = paymentProcessor.ProcessPayment( payment );
 
 			Assert.AreEqual( "another partial payment received, still not fully paid", result );
-			Assert.That(invoice.Payments.Count, Is.EqualTo(2));
+			Assert.AreEqual( invoice.Payments.Count, 2 );
 		}
 
 		[Test]
 		public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidIsLessThanInvoiceAmount( )
 		{
-            var repo = new InvoiceRepository();
-            var validator = new PaymentValidator();
-            var invoiceService = new InvoiceService(repo, validator);
+            var repo = new InvoiceRepository( );
+            var validator = new PaymentValidator( );
+            var invoiceService = new InvoiceService( repo, validator );
 
-            var invoice = new Invoice()
+            var invoice = new Invoice
 			{
 				Amount = 10,
 				AmountPaid = 0,
@@ -299,7 +299,7 @@ namespace RefactorThis.Domain.Tests
 
 			IInvoicePaymentProcessor paymentProcessor = new InvoicePaymentProcessor( invoiceService );
 
-			var payment = new Payment( )
+			var payment = new Payment
 			{
 				Amount = 1
 			};
@@ -310,49 +310,49 @@ namespace RefactorThis.Domain.Tests
 		}
 
         [Test]
-        public void ProcessPayment_Should_ReturnPFullyPaidMessage_When_NoPartialPaymentExistsAndAmountIsTheSameAsTheInvoiceAmount()
+        public void ProcessPayment_Should_ReturnPFullyPaidMessage_When_NoPartialPaymentExistsAndAmountIsTheSameAsTheInvoiceAmount( )
         {
-			var repo = new InvoiceRepository();
-            var validator = new PaymentValidator();
-            var invoiceService = new InvoiceService(repo, validator);
+			var repo = new InvoiceRepository( );
+            var validator = new PaymentValidator( );
+            var invoiceService = new InvoiceService( repo, validator );
 
-            var invoice = new Invoice()
+            var invoice = new Invoice
 			{
                 Amount = 10,
                 AmountPaid = 0,
-                Payments = new List<Payment>()
+                Payments = new List<Payment>( )
             };
-            repo.Add(invoice);
+            repo.Add( invoice );
 
             IInvoicePaymentProcessor paymentProcessor = new InvoicePaymentProcessor( invoiceService );
 
-            var payment = new Payment()
+            var payment = new Payment
             {
                 Amount = 10
             };
 
-            var result = paymentProcessor.ProcessPayment(payment);
+            var result = paymentProcessor.ProcessPayment( payment );
 
-            Assert.AreEqual("invoice is now fully paid", result);
+            Assert.AreEqual( "invoice is now fully paid", result );
         }
 
         [Test]
-        public void ProcessPayment_Should_ThrowArgumentNull_When_InvoiceIsNullWhenAddingPayment()
+        public void ProcessPayment_Should_ThrowArgumentNull_When_InvoiceIsNullWhenAddingPayment( )
         {
-            var repo = new InvoiceRepository();
-            var validator = new PaymentValidator();
-            var invoiceService = new InvoiceService(repo, validator);
+            var repo = new InvoiceRepository( );
+            var validator = new PaymentValidator( );
+            var invoiceService = new InvoiceService( repo, validator );
 
-            var invoice = new Invoice()
+            var invoice = new Invoice
             {
                 Amount = 10,
                 AmountPaid = 0,
-                Payments = new List<Payment>()
+                Payments = new List<Payment>( )
             };
 
-            repo.Add(invoice);
+            repo.Add( invoice );
 
-            IInvoicePaymentProcessor paymentProcessor = new InvoicePaymentProcessor(invoiceService);
+            IInvoicePaymentProcessor paymentProcessor = new InvoicePaymentProcessor( invoiceService );
 
             Payment payment = null;
 
@@ -360,14 +360,14 @@ namespace RefactorThis.Domain.Tests
 
             try
             {
-                var result = paymentProcessor.ProcessPayment(payment);
+                var result = paymentProcessor.ProcessPayment( payment );
             }
-            catch (ArgumentNullException e)
+            catch ( ArgumentNullException e )
             {
                 failureMessage = e.Message;
             }
 
-            Assert.AreEqual("Must have a valid payment to add\r\nParameter name: payment", failureMessage);
+            Assert.AreEqual( "Must have a valid payment to add\r\nParameter name: payment", failureMessage );
         }
 	}
 }

@@ -9,29 +9,29 @@ namespace RefactorThis.Domain.PaymentChecks
     {
         private readonly IList<IPaymentRule> _paymentRules;
 
-        public PaymentValidator()
+        public PaymentValidator( )
         {
             _paymentRules = new List<IPaymentRule>
             {
-                new NoPaymentNeededRule(),
-                new InvalidInvoiceRule(),
-                new InvoiceAlreadyFullyPaidRule(),
-                new PaymentIsGreaterThanRemainingAmountRule(),
-                new InvoiceNowFullyPaidRule(),
-                new PaymentReceivedNotFullPaidRule(),
-                new PaymentAmountGreaterThanInvoiceAmountRule(),
-                new NoPaymentsInvoiceIsFullyPaidRule(),
-                new NoPaymentsInvoiceIsPartiallyPaidRule(),
+                new NoPaymentNeededRule( ),
+                new InvalidInvoiceRule( ),
+                new InvoiceAlreadyFullyPaidRule( ),
+                new PaymentIsGreaterThanRemainingAmountRule( ),
+                new InvoiceNowFullyPaidRule( ),
+                new PaymentReceivedNotFullPaidRule( ),
+                new PaymentAmountGreaterThanInvoiceAmountRule( ),
+                new NoPaymentsInvoiceIsFullyPaidRule( ),
+                new NoPaymentsInvoiceIsPartiallyPaidRule( ),
             };
         }
 
-        public PaymentResult Validate(Invoice inv, Payment payment)
+        public PaymentResult Validate( Invoice inv, Payment payment )
         {
-            var paymentResult = new PaymentResult();
-            foreach (var paymentRule in _paymentRules)
+            var paymentResult = new PaymentResult( );
+            foreach ( var paymentRule in _paymentRules )
             {
-                paymentResult = paymentRule.RunRule(inv, payment);
-                if (paymentResult.HasConditionMet)
+                paymentResult = paymentRule.RunRule( inv, payment );
+                if ( paymentResult.HasConditionMet )
                 {
                     return paymentResult;
                 }

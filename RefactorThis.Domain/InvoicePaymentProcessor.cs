@@ -15,9 +15,9 @@ namespace RefactorThis.Domain
 
 		public string ProcessPayment( Payment payment )
 		{
-            if (payment == null)
+            if ( payment == null )
             {
-                throw new ArgumentNullException(nameof(payment), "Must have a valid payment to add");
+                throw new ArgumentNullException( nameof( payment ), "Must have a valid payment to add" );
             }
             
             var inv = _invoiceService.GetInvoice( payment.Reference );
@@ -27,9 +27,9 @@ namespace RefactorThis.Domain
 				throw new InvalidOperationException( "There is no invoice matching this payment" );
 			}
 
-            var responseMessage = _invoiceService.AddPaymentToInvoice(inv, payment);
+            var responseMessage = _invoiceService.AddPaymentToInvoice( inv, payment );
 
-            _invoiceService.SaveInvoice(inv);
+            _invoiceService.SaveInvoice( inv );
             return responseMessage;
 		}
 	}

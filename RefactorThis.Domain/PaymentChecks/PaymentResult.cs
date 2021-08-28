@@ -6,6 +6,6 @@
 
         public  bool AddPayment { get; set; }
 
-        public bool HasConditionMet => !string.IsNullOrEmpty(this.ResponseMessage);
+        public bool HasConditionMet => !string.IsNullOrEmpty( this.ResponseMessage );
     }
 }

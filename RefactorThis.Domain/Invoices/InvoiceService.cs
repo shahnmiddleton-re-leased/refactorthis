@@ -9,28 +9,28 @@ namespace RefactorThis.Domain.Invoices
         private readonly IInvoiceRepository _invoiceRepository;
         private readonly IPaymentValidator _paymentValidator;
 
-        public InvoiceService(IInvoiceRepository invoiceRepository, IPaymentValidator paymentValidator)
+        public InvoiceService( IInvoiceRepository invoiceRepository, IPaymentValidator paymentValidator )
         {
             _invoiceRepository = invoiceRepository;
             _paymentValidator = paymentValidator;
         }
-        public void SaveInvoice(Invoice invoice)
+        public void SaveInvoice( Invoice invoice )
         {
-            _invoiceRepository.SaveInvoice(invoice);
+            _invoiceRepository.SaveInvoice( invoice );
         }
 
-        public Invoice GetInvoice(string reference)
+        public Invoice GetInvoice( string reference )
         {
-            return _invoiceRepository.GetInvoice(reference);
+            return _invoiceRepository.GetInvoice( reference );
         }
 
-        public string AddPaymentToInvoice(Invoice inv, Payment payment)
+        public string AddPaymentToInvoice( Invoice inv, Payment payment )
         {
-            var result = this._paymentValidator.Validate(inv, payment);
+            var result = this._paymentValidator.Validate( inv, payment );
 
-            if (result.AddPayment)
+            if ( result.AddPayment )
             {
-                inv.Payments.Add(payment);
+                inv.Payments.Add( payment );
             }
 
             return result.ResponseMessage;

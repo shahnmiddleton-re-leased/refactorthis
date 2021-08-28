@@ -6,13 +6,13 @@ namespace RefactorThis.Domain.PaymentChecks.Rules
 {
     public class InvoiceNowFullyPaidRule : IPaymentRule
     {
-        public PaymentResult RunRule(Invoice invoice, Payment payment)
+        public PaymentResult RunRule( Invoice invoice, Payment payment )
         {
-            var paymentResult = new PaymentResult();
+            var paymentResult = new PaymentResult( );
 
-            if (!invoice.Payments.Any()) return paymentResult;
+            if ( !invoice.Payments.Any( ) ) return paymentResult;
             
-            if ((invoice.Amount - invoice.AmountPaid) == payment.Amount)
+            if ( invoice.Amount - invoice.AmountPaid == payment.Amount )
             {
                 paymentResult.ResponseMessage = "final partial payment received, invoice is now fully paid";
                 paymentResult.AddPayment = true;
