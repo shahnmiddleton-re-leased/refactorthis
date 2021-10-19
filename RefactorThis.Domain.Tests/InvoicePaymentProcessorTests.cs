@@ -9,11 +9,10 @@ namespace RefactorThis.Domain.Tests
 	public class InvoicePaymentProcessorTests
 	{
 		[Test]
-		public void ProcessPayment_Should_ThrowException_When_NoInoiceFoundForPaymentReference( )
+		public void ProcessPayment_Should_ThrowException_When_NoInvoiceFoundForPaymentReference( )
 		{
 			var repo = new InvoiceRepository( );
 
-			Invoice invoice = null;
 			var paymentProcessor = new InvoicePaymentProcessor( repo );
 
 			var payment = new Payment( );
