@@ -14,11 +14,11 @@ namespace RefactorThis.Application.Invoices.Commands
         public string Reference { get; set; } = string.Empty;
     }
 
-    public class CreateTodoItemCommandHandler : IRequestHandler<InvoiceAddPaymentCommand, string>
+    public class InvoiceAddPaymentCommandHandler : IRequestHandler<InvoiceAddPaymentCommand, string>
     {
         readonly IInvoiceRepository _invoiceRepository;
         readonly IPaymentRepository _paymentRepository;
-        public CreateTodoItemCommandHandler(IInvoiceRepository invoiceRepository, IPaymentRepository paymentRepository)
+        public InvoiceAddPaymentCommandHandler(IInvoiceRepository invoiceRepository, IPaymentRepository paymentRepository)
         {
             _invoiceRepository = invoiceRepository;
             _paymentRepository = paymentRepository;
