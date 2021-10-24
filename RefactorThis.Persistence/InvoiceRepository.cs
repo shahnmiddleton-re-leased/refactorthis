@@ -1,21 +1,17 @@
-namespace RefactorThis.Persistence {
-	public class InvoiceRepository
-	{
-		private Invoice _invoice;
+using RefactorThis.Application.Common.Interfaces;
+using RefactorThis.Domain.Entities;
+using System.Threading.Tasks;
 
-		public Invoice GetInvoice( string reference )
-		{
-			return _invoice;
-		}
+namespace RefactorThis.Persistence
+{
+    public class InvoiceRepository : IInvoiceRepository
+    {
+        public Task<Invoice> GetByIdAsync(string id)
+        {
+            // if not found it should throw exception
+            // throw new NotFoundException(nameof(Invoice), Id); 
 
-		public void SaveInvoice( Invoice invoice )
-		{
-			//saves the invoice to the database
-		}
-
-		public void Add( Invoice invoice )
-		{
-			_invoice = invoice;
-		}
-	}
+            return Task.FromResult(new Invoice());
+        }
+    }
 }
