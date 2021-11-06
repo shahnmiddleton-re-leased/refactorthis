@@ -49,21 +49,29 @@ namespace RefactorThis.Domain
 			}
 			else
 			{
-				if ( invoice.HasPayments() )
+				if (invoice.HasPayments())
 				{
 					var totalPayments = invoice.TotalPayments();
-					if ( totalPayments != 0 )
+					if (totalPayments != 0)
 					{
-						if ( invoice.Amount == totalPayments )
+						if (invoice.Amount == totalPayments)
 						{
 							message = "invoice was already fully paid";
 							paymentReqd = false;
 						}
-						else if ( payment.Amount > invoice.AmountOutstanding )
+						else if (payment.Amount > invoice.AmountOutstanding)
 						{
 							message = "the payment is greater than the partial amount remaining";
 							paymentReqd = false;
 						}
+					}
+				}
+				else
+				{
+					if (payment.Amount > invoice.Amount)
+					{
+						message = "the payment is greater than the invoice amount";
+						paymentReqd = false;
 					}
 				}
 			}
@@ -96,23 +104,16 @@ namespace RefactorThis.Domain
 				}
 				else
 				{
-					if (payment.Amount > invoice.Amount)
+					if (invoice.Amount == payment.Amount)
 					{
-						responseMessage = "the payment is greater than the invoice amount";
+						responseMessage = "invoice is now fully paid";
 					}
 					else
 					{
-						if (invoice.Amount == payment.Amount)
-						{
-							responseMessage = "invoice is now fully paid";
-						}
-						else
-						{
-							responseMessage = "invoice is now partially paid";
-						}
-
-						invoice.MakePayment(payment);
+						responseMessage = "invoice is now partially paid";
 					}
+
+					invoice.MakePayment(payment);
 				}
 			}
 
