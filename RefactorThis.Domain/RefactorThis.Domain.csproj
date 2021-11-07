@@ -38,8 +38,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="InvoicePaymentProcessor.cs" />
+    <Compile Include="PaymentProcessor\InvoicePaymentProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PaymentProcessor\Validators\AdditionalPaymentValidator.cs" />
+    <Compile Include="PaymentProcessor\Validators\FirstPaymentValidator.cs" />
+    <Compile Include="PaymentProcessor\Validators\IPaymentProcessorValidator.cs" />
+    <Compile Include="PaymentProcessor\Validators\IPaymentValidator.cs" />
+    <Compile Include="PaymentProcessor\Validators\IPaymentValidatorAbstractFactory.cs" />
+    <Compile Include="PaymentProcessor\Validators\PaymentProcessorValidator.cs" />
+    <Compile Include="PaymentProcessor\Validators\PaymentValidatorAbstractFactory.cs" />
+    <Compile Include="Common\ValidationModel\ValidationStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RefactorThis.Persistence\RefactorThis.Persistence.csproj">
