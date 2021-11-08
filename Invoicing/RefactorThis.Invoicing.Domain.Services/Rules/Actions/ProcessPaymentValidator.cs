@@ -48,41 +48,14 @@ namespace RefactorThis.Invoicing.Domain.Services.Rules.Actions
 					else if (inv.Payments.Sum(x => x.Amount) != 0 && payment.Amount > (inv.Amount - inv.AmountPaid))
 					{
 						validationList.Add(InvoicingMessages.Validations["INV00005"]);						
-					}
-					//else
-					//{
-					//	if ((inv.Amount - inv.AmountPaid) == payment.Amount)
-					//	{
-					//		inv.AmountPaid += payment.Amount;
-					//		inv.Payments.Add(payment);
-					//		responseMessage = "final partial payment received, invoice is now fully paid";
-					//	}
-					//	else
-					//	{
-					//		inv.AmountPaid += payment.Amount;
-					//		inv.Payments.Add(payment);
-					//		responseMessage = "another partial payment received, still not fully paid";
-					//	}
-					//}
+					}					
 				}
 				else
 				{
 					if (payment.Amount > inv.Amount)
 					{
 						validationList.Add(InvoicingMessages.Validations["INV00006"]);
-					}
-					//else if (inv.Amount == payment.Amount)
-					//{
-					//	inv.AmountPaid = payment.Amount;
-					//	inv.Payments.Add(payment);
-					//	responseMessage = "invoice is now fully paid";
-					//}
-					//else
-					//{
-					//	inv.AmountPaid = payment.Amount;
-					//	inv.Payments.Add(payment);
-					//	responseMessage = "invoice is now partially paid";
-					//}
+					}					
 				}
 			}
 			return validationList;
