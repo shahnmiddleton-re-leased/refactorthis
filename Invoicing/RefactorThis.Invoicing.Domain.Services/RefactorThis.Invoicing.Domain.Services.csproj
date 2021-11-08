@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\RefactorThis.Common.Rules\RefactorThis.Common.Rules.csproj" />
+    <ProjectReference Include="..\RefactorThis.Invoicing.DataAccess.Interfaces\RefactorThis.Invoicing.DataAccess.Interfaces.csproj" />
+    <ProjectReference Include="..\RefactorThis.Invoicing.DataAccess.Repository\RefactorThis.Invoicing.DataAccess.Repository.csproj" />
+    <ProjectReference Include="..\RefactorThis.Invoicing.Domain.Interfaces\RefactorThis.Invoicing.Domain.Interfaces.csproj" />
+  </ItemGroup>
+
+</Project>
