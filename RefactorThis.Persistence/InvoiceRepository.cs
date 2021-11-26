@@ -1,3 +1,5 @@
+using RefactorThis.Persistence.Model;
+
 namespace RefactorThis.Persistence {
 	public class InvoiceRepository
 	{
@@ -8,7 +10,7 @@ namespace RefactorThis.Persistence {
 			return _invoice;
 		}
 
-		public void SaveInvoice( Invoice invoice )
+		public void SaveInvoice()
 		{
 			//saves the invoice to the database
 		}

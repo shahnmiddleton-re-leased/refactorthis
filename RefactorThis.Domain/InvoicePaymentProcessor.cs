@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using RefactorThis.Persistence;
+using RefactorThis.Persistence.Model;
 
 namespace RefactorThis.Domain
 {
@@ -86,8 +87,8 @@ namespace RefactorThis.Domain
 				}
 			}
 			
-			inv.Save();
-
+			_invoiceRepository.Add(inv);
+            _invoiceRepository.SaveInvoice();
 			return responseMessage;
 		}
 	}
