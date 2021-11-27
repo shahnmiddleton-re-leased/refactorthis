@@ -1,14 +1,17 @@
+using RefactorThis.Persistence.Model;
+
 namespace RefactorThis.Persistence {
-	public class InvoiceRepository
+	public class InvoiceRepository : IRepository<Invoice>
 	{
 		private Invoice _invoice;
 
-		public Invoice GetInvoice( string reference )
+		public Invoice Get( string reference )
 		{
-			return _invoice;
+			//TODO: Connect it to a datasource
+			return new Invoice();
 		}
 
-		public void SaveInvoice( Invoice invoice )
+		public void Save()
 		{
 			//saves the invoice to the database
 		}
