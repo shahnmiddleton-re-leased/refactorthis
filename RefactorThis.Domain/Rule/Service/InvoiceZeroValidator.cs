@@ -14,7 +14,7 @@ namespace RefactorThis.Domain.Rule.Service
         {
             _terminate = false;
         }
-        public (Invoice, string) Process(Invoice invoice, Payment payment)
+        public (Invoice, string, bool) Process(Invoice invoice, Payment payment)
         {
             string responseMessage = string.Empty;
             if (invoice.Amount == 0)
@@ -30,7 +30,7 @@ namespace RefactorThis.Domain.Rule.Service
                         "The invoice is in an invalid state, it has an amount of 0 and it has payments.");
                 }
             }
-            return (invoice, responseMessage);
+            return (invoice, responseMessage, !_terminate);
         }
         public bool IsTerminate()
         {

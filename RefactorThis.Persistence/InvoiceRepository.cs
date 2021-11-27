@@ -7,7 +7,8 @@ namespace RefactorThis.Persistence {
 
 		public Invoice Get( string reference )
 		{
-			return _invoice;
+			//TODO: Connect it to a datasource
+			return new Invoice();
 		}
 
 		public void Save()

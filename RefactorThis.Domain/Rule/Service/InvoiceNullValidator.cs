@@ -11,13 +11,13 @@ namespace RefactorThis.Domain.Rule.Service
 {
     public class InvoiceNullValidator : IPaymentRule
     {
-        public (Invoice, string) Process(Invoice invoice, Payment payment)
+        public (Invoice, string, bool) Process(Invoice invoice, Payment payment)
         {
             if (invoice == null)
             {
                 throw new InvalidOperationException("There is no invoice matching this payment");
             }
-            return (invoice, String.Empty);
+            return (invoice, String.Empty ,true);
         }
         public bool IsTerminate()
         {

@@ -27,9 +27,10 @@ namespace RefactorThis.Domain.Rule.Service
         {
             return (invoice.Amount - invoice.AmountPaid) == payment.Amount;
         }
-        public (Invoice, string) Process(Invoice invoice, Payment payment)
+        public (Invoice, string, bool) Process(Invoice invoice, Payment payment)
         {
             string responseMessage = string.Empty;
+            bool success = false;
             // We code broke it to multiple rules 
             if (invoice.Payments != null && invoice.Payments.Any())
             {
@@ -37,20 +38,25 @@ namespace RefactorThis.Domain.Rule.Service
                 {
                     responseMessage = "invoice was already fully paid";
                     _terminate = true;
+                    success = false;
                 }
                 else if (IsGreaterThanRemaining(invoice, payment))
                 {
                     responseMessage = "the payment is greater than the partial amount remaining";
                     _terminate = true;
+                    success = false;
+
                 }
                 else
                 {
+                    success = true;
                     if (IsFullyPaid(invoice, payment))
                     {
                         invoice.AmountPaid += payment.Amount;
                         invoice.Payments.Add(payment);
                         responseMessage = "final partial payment received, invoice is now fully paid";
                         _terminate = true;
+
                     }
                     else
                     {
@@ -61,7 +67,7 @@ namespace RefactorThis.Domain.Rule.Service
                     }
                 }
             }
-            return (invoice, responseMessage);
+            return (invoice, responseMessage, success);
         }
         public bool IsTerminate()
         {

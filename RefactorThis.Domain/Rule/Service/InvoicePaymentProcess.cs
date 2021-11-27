@@ -14,13 +14,16 @@ namespace RefactorThis.Domain.Rule.Service
         {
             _terminate = false;
         }
-        public (Invoice, string) Process(Invoice invoice, Payment payment)
+        public (Invoice, string, bool) Process(Invoice invoice, Payment payment)
         {
             string responseMessage = string.Empty;
+            bool success = false;
+
             if (payment.Amount > invoice.Amount)
             {
                 responseMessage = "the payment is greater than the invoice amount";
                 _terminate = true;
+                success = false;
             }
             else if (invoice.Amount == payment.Amount)
             {
@@ -28,6 +31,8 @@ namespace RefactorThis.Domain.Rule.Service
                 invoice.Payments.Add(payment);
                 responseMessage = "invoice is now fully paid";
                 _terminate = true;
+                success = true;
+
             }
             else
             {
@@ -35,8 +40,9 @@ namespace RefactorThis.Domain.Rule.Service
                 invoice.Payments.Add(payment);
                 responseMessage = "invoice is now partially paid";
                 _terminate = true;
+                success = true;
             }
-            return (invoice, responseMessage);
+            return (invoice, responseMessage, success);
         }
         public bool IsTerminate()
         {

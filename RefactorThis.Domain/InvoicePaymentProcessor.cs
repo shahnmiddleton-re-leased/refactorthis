@@ -10,10 +10,10 @@ namespace RefactorThis.Domain
 {
 	public class InvoicePaymentProcessor
 	{
-		private readonly InvoiceRepository _invoiceRepository;
+		private readonly IRepository<Invoice> _invoiceRepository;
         List<IPaymentRule> _rules = new List<IPaymentRule>();
 
-		public InvoicePaymentProcessor( InvoiceRepository invoiceRepository )
+		public InvoicePaymentProcessor(IRepository<Invoice> invoiceRepository )
 		{
 			_invoiceRepository = invoiceRepository;
             _rules.Add(new InvoiceNullValidator());
@@ -22,23 +22,21 @@ namespace RefactorThis.Domain
             _rules.Add(new InvoicePaymentProcess());
         }
 
-        public string ProcessPayment(Payment payment)
+        public (string,bool) ProcessPayment(Payment payment)
         {
             var inv = _invoiceRepository.Get(payment.Reference);
             var responseMessage = string.Empty;
-
+            bool success = false;
             foreach (var rule in _rules)
             {
-                (inv, responseMessage) = rule.Process(inv, payment);
+                (inv, responseMessage, success) = rule.Process(inv, payment);
                 if (rule.IsTerminate())
-                    return responseMessage;
+                    return (responseMessage, success);
             }
-
-            
 
             _invoiceRepository.Add(inv);
             _invoiceRepository.Save();
-            return responseMessage;
+            return (responseMessage, success);
         }
     }
 }
