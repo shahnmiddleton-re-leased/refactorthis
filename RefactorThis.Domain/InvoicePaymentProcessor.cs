@@ -16,7 +16,7 @@ namespace RefactorThis.Domain
 
 		public string ProcessPayment( Payment payment )
 		{
-			var inv = _invoiceRepository.GetInvoice( payment.Reference );
+			var inv = _invoiceRepository.Get( payment.Reference );
 
 			var responseMessage = string.Empty;
 
@@ -88,7 +88,7 @@ namespace RefactorThis.Domain
 			}
 			
 			_invoiceRepository.Add(inv);
-            _invoiceRepository.SaveInvoice();
+            _invoiceRepository.Save();
 			return responseMessage;
 		}
 	}
