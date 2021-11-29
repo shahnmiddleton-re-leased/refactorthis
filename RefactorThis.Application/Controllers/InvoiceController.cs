@@ -1,6 +1,5 @@
 ﻿using RefactorThis.Domain.Entities.Invoices;
 using RefactorThis.Domain.Interfaces;
-using System;
 
 namespace RefactorThis.Application.Controllers
 {

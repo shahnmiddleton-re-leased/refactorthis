@@ -9,12 +9,12 @@ namespace RefactorThis.Domain.Entities.Invoices
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private List<IPaymentRule> _paymentRules;
 
-		public InvoicePaymentProcessor(List<IPaymentRule> paymentRules)
+        public InvoicePaymentProcessor(List<IPaymentRule> paymentRules)
         {
             _paymentRules = paymentRules;
-		}
+        }
 
-		public string ProcessPayment(Invoice invoice, Payment payment)
+        public string ProcessPayment(Invoice invoice, Payment payment)
         {
             if (invoice is null)
                 throw new InvalidOperationException("There is no invoice matching this payment");
