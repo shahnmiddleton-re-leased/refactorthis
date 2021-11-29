@@ -62,7 +62,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="InvoicePaymentProcessor.Tests.cs" />
+    <Compile Include="Entities\Invoices\InvoicePaymentProcessor.Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

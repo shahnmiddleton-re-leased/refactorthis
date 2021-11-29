@@ -1,10 +1,9 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
-using RefactorThis.Domain.Entities.Invoices;
 using System;
 using System.Collections.Generic;
 
-namespace RefactorThis.Domain.Tests
+namespace RefactorThis.Domain.Entities.Invoices.Tests
 {
     [TestFixture]
     public class InvoicePaymentProcessorTests
