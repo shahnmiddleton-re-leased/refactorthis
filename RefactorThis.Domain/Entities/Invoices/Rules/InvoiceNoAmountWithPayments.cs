@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace RefactorThis.Domain.Entities.Invoices.Rules
 {
@@ -7,7 +8,7 @@ namespace RefactorThis.Domain.Entities.Invoices.Rules
         public string ProcessPaymentRule(Invoice invoice, Payment payment)
         {
             if (invoice.Amount == 0 && invoice.Payments.Any())
-                return "The invoice is in an invalid state, it has an amount of 0 and it has payments.";
+                throw new InvalidOperationException("The invoice is in an invalid state, it has an amount of 0 and it has payments.");
 
             return null;
         }
