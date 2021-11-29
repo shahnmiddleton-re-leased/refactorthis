@@ -3,6 +3,12 @@
 	<PropertyGroup>
 		<TargetFramework>net472</TargetFramework>
 		<LangVersion>7.3</LangVersion>
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\RefactorThis.Domain\RefactorThis.Domain.csproj" />
+	</ItemGroup>
 
 </Project>
