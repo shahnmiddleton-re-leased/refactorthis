@@ -1,94 +1,39 @@
-using System;
-using System.Linq;
 using RefactorThis.Persistence;
 
 namespace RefactorThis.Domain
 {
-	public class InvoicePaymentProcessor
+    /// <summary>
+    /// The Invoice Payment Processor
+    /// </summary>
+    public static class InvoicePaymentProcessor
 	{
-		private readonly InvoiceRepository _invoiceRepository;
+        /// <summary>
+        /// Processes a payment for the specified invoice number.
+        /// </summary>
+        /// <param name="invoiceNumber">The invoice number.</param>
+        /// <param name="payment">The payment.</param>
+        /// <returns>The result of the processed payment</returns>
+        public static InvoicePaymentResult Process(string invoiceNumber, Payment payment)
+        {
+            var invoice = InvoiceRepository.Instance.GetInvoiceByInvoiceNumber(invoiceNumber);
 
-		public InvoicePaymentProcessor( InvoiceRepository invoiceRepository )
-		{
-			_invoiceRepository = invoiceRepository;
-		}
+            if (invoice is null) return InvoicePaymentResult.NotPaid_NoMatchingInvoice;
+            if (invoice.Amount == 0M) return InvoicePaymentResult.NotPaid_NoPaymentNeeded;
+            if (invoice.Balance == 0M) return InvoicePaymentResult.NotPaid_AlreadyFullyPaid;
+            if (payment.Amount > invoice.Balance) return InvoicePaymentResult.NotPaid_Overpayment;
 
-		public string ProcessPayment( Payment payment )
-		{
-			var inv = _invoiceRepository.GetInvoice( payment.Reference );
+			invoice.MakePayment(payment);
 
-			var responseMessage = string.Empty;
+            if (!InvoiceRepository.Instance.SaveInvoice(invoice))
+            {
+                invoice.ReversePayment(payment);
 
-			if ( inv == null )
-			{
-				throw new InvalidOperationException( "There is no invoice matching this payment" );
-			}
-			else
-			{
-				if ( inv.Amount == 0 )
-				{
-					if ( inv.Payments == null || !inv.Payments.Any( ) )
-					{
-						responseMessage = "no payment needed";
-					}
-					else
-					{
-						throw new InvalidOperationException( "The invoice is in an invalid state, it has an amount of 0 and it has payments." );
-					}
-				}
-				else
-				{
-					if ( inv.Payments != null && inv.Payments.Any( ) )
-					{
-						if ( inv.Payments.Sum( x => x.Amount ) != 0 && inv.Amount == inv.Payments.Sum( x => x.Amount ) )
-						{
-							responseMessage = "invoice was already fully paid";
-						}
-						else if ( inv.Payments.Sum( x => x.Amount ) != 0 && payment.Amount > ( inv.Amount - inv.AmountPaid ) )
-						{
-							responseMessage = "the payment is greater than the partial amount remaining";
-						}
-						else
-						{
-							if ( ( inv.Amount - inv.AmountPaid ) == payment.Amount )
-							{
-								inv.AmountPaid += payment.Amount;
-								inv.Payments.Add( payment );
-								responseMessage = "final partial payment received, invoice is now fully paid";
-							}
-							else
-							{
-								inv.AmountPaid += payment.Amount;
-								inv.Payments.Add( payment );
-								responseMessage = "another partial payment received, still not fully paid";
-							}
-						}
-					}
-					else
-					{
-						if ( payment.Amount > inv.Amount )
-						{
-							responseMessage = "the payment is greater than the invoice amount";
-						}
-						else if ( inv.Amount == payment.Amount )
-						{
-							inv.AmountPaid = payment.Amount;
-							inv.Payments.Add( payment );
-							responseMessage = "invoice is now fully paid";
-						}
-						else
-						{
-							inv.AmountPaid = payment.Amount;
-							inv.Payments.Add( payment );
-							responseMessage = "invoice is now partially paid";
-						}
-					}
-				}
-			}
-			
-			inv.Save();
+                return InvoicePaymentResult.NotPaid_FailedToSaveToDatabase;
+            }
 
-			return responseMessage;
-		}
+            return invoice.Balance > 0M
+                ? InvoicePaymentResult.Paid_PartialAmountRemaining
+                : InvoicePaymentResult.Paid_InvoiceFullyPaid;
+        }
 	}
 }
