@@ -43,38 +43,27 @@ namespace RefactorThis.Domain
             }
             else
             {
-                if (inv.Payments != null && inv.Payments.Any())
+                var pendingPayment = inv.PaymentPending();
+                if (pendingPayment > 0M)
                 {
-                    if (inv.Payments.Sum(x => x.Amount) != 0 && inv.Amount == inv.Payments.Sum(x => x.Amount))
+                    if (payment.Amount > pendingPayment)
                     {
-                        responseMessage = "invoice was already fully paid";
+                        responseMessage = (payment.Amount > inv.Amount) ? "the payment is greater than the invoice amount" : "the payment is greater than the amount remaining";
                     }
-                    else if (inv.Payments.Sum(x => x.Amount) != 0 && payment.Amount > (inv.Amount - inv.AmountPaid))
+                    else if(payment.Amount == pendingPayment)
                     {
-                        responseMessage = "the payment is greater than the partial amount remaining";
+                        inv.AddPayment(payment);
+                        responseMessage = "invoice is now fully paid";
                     }
                     else
                     {
-                        responseMessage = (inv.Amount - inv.AmountPaid) == payment.Amount
-                            ? "final partial payment received, invoice is now fully paid"
-                            : "another partial payment received, still not fully paid";
-
-                        inv.AmountPaid += payment.Amount;
-                        inv.Payments.Add(payment);
+                        inv.AddPayment(payment);
+                        responseMessage = "invoice is now partially paid";
                     }
                 }
-                else
+                else if (pendingPayment == 0M)
                 {
-                    if (payment.Amount > inv.Amount)
-                    {
-                        responseMessage = "the payment is greater than the invoice amount";
-                    }
-                    else
-                    {
-                        inv.AmountPaid = payment.Amount;
-                        inv.Payments.Add(payment);
-                        responseMessage = (inv.Amount == payment.Amount) ? "invoice is now fully paid" : "invoice is now partially paid";
-                    }
+                    responseMessage = "invoice was already fully paid";
                 }
 
                 inv.Save();
