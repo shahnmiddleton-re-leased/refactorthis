@@ -4,91 +4,60 @@ using RefactorThis.Persistence;
 
 namespace RefactorThis.Domain
 {
-	public class InvoicePaymentProcessor
-	{
-		private readonly InvoiceRepository _invoiceRepository;
+    public class InvoicePaymentProcessor : IInvoicePaymentProcessor
+    {
+        private readonly IInvoiceRepository _invoiceRepository;
 
-		public InvoicePaymentProcessor( InvoiceRepository invoiceRepository )
-		{
-			_invoiceRepository = invoiceRepository;
-		}
+        public InvoicePaymentProcessor(IInvoiceRepository invoiceRepository)
+        {
+            _invoiceRepository = invoiceRepository;
+        }
 
-		public string ProcessPayment( Payment payment )
-		{
-			var inv = _invoiceRepository.GetInvoice( payment.Reference );
+        public string ProcessPayment(Payment payment)
+        {
+            if (payment == null)
+            {
+                throw new ArgumentNullException(nameof(payment), "parameter cannot be null");
+            }
 
-			var responseMessage = string.Empty;
+            var inv = _invoiceRepository.GetInvoice(payment.Reference);
 
-			if ( inv == null )
-			{
-				throw new InvalidOperationException( "There is no invoice matching this payment" );
-			}
-			else
-			{
-				if ( inv.Amount == 0 )
-				{
-					if ( inv.Payments == null || !inv.Payments.Any( ) )
-					{
-						responseMessage = "no payment needed";
-					}
-					else
-					{
-						throw new InvalidOperationException( "The invoice is in an invalid state, it has an amount of 0 and it has payments." );
-					}
-				}
-				else
-				{
-					if ( inv.Payments != null && inv.Payments.Any( ) )
-					{
-						if ( inv.Payments.Sum( x => x.Amount ) != 0 && inv.Amount == inv.Payments.Sum( x => x.Amount ) )
-						{
-							responseMessage = "invoice was already fully paid";
-						}
-						else if ( inv.Payments.Sum( x => x.Amount ) != 0 && payment.Amount > ( inv.Amount - inv.AmountPaid ) )
-						{
-							responseMessage = "the payment is greater than the partial amount remaining";
-						}
-						else
-						{
-							if ( ( inv.Amount - inv.AmountPaid ) == payment.Amount )
-							{
-								inv.AmountPaid += payment.Amount;
-								inv.Payments.Add( payment );
-								responseMessage = "final partial payment received, invoice is now fully paid";
-							}
-							else
-							{
-								inv.AmountPaid += payment.Amount;
-								inv.Payments.Add( payment );
-								responseMessage = "another partial payment received, still not fully paid";
-							}
-						}
-					}
-					else
-					{
-						if ( payment.Amount > inv.Amount )
-						{
-							responseMessage = "the payment is greater than the invoice amount";
-						}
-						else if ( inv.Amount == payment.Amount )
-						{
-							inv.AmountPaid = payment.Amount;
-							inv.Payments.Add( payment );
-							responseMessage = "invoice is now fully paid";
-						}
-						else
-						{
-							inv.AmountPaid = payment.Amount;
-							inv.Payments.Add( payment );
-							responseMessage = "invoice is now partially paid";
-						}
-					}
-				}
-			}
-			
-			inv.Save();
+            if (inv == null)
+            {
+                throw new InvalidOperationException("There is no invoice matching this payment");
+            }
 
-			return responseMessage;
-		}
-	}
+            string responseMessage;
+
+            if (inv.Amount > 0)
+            {
+                var pendingPayment = inv.PaymentPending();
+                if (pendingPayment > 0)
+                {
+                    if (payment.Amount > pendingPayment)
+                    {
+                        responseMessage = (payment.Amount > inv.Amount) ? "the payment is greater than the invoice amount" : "the payment is greater than the amount remaining";
+                    }
+                    else
+                    {
+                        inv.AddPayment(payment);
+                        responseMessage = (payment.Amount == pendingPayment) ? "invoice is now fully paid" : "invoice is now partially paid";
+                    }
+                }
+                else
+                {
+                    responseMessage = "invoice was already fully paid";
+                }
+
+                inv.Save();
+            }
+            else
+            {
+                // We can also check here if we need to reverse the payment and extend this case to reverse the payment.
+                responseMessage = "no payment needed";
+            }
+
+            return responseMessage;
+        }
+    }
 }
