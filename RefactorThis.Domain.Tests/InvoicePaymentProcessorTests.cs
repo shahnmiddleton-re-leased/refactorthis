@@ -11,21 +11,27 @@ namespace RefactorThis.Domain.Tests
     {
         private IInvoiceRepository _invoiceRepository;
         private IInvoicePaymentProcessor _invoicePaymentProcessor;
+        private IList<Payment> _invoicePaymentsList;
 
         [SetUp]
         public void InitializeTest()
         {
             _invoiceRepository = new InvoiceRepository();
             _invoicePaymentProcessor = new InvoicePaymentProcessor(_invoiceRepository);
+            _invoicePaymentsList = new List<Payment>();
         }
 
-        public void CreateInvoice(decimal amount, IList<Payment> payments)
+        public void CreateInvoice(decimal amount)
         {
             var invoice = new Invoice(_invoiceRepository)
             {
                 Amount = amount,
-                Payments = payments?.ToList()
             };
+
+            foreach (var payment in _invoicePaymentsList)
+            {
+                invoice.AddPayment(payment);
+            }
 
             _invoiceRepository.Add(invoice);
         }
@@ -51,7 +57,7 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_NoPaymentNeeded()
         {
-            CreateInvoice(0, null);
+            CreateInvoice(0);
             var payment = new Payment();
 
             var result = _invoicePaymentProcessor.ProcessPayment(payment);
@@ -62,14 +68,12 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_InvoiceAlreadyFullyPaid()
         {
-            var payments = new List<Payment>
-            {
+            _invoicePaymentsList.Add(
                 new Payment
                 {
                     Amount = 10
-                }
-            };
-            CreateInvoice(10, payments);
+                });
+            CreateInvoice(10);
 
             var payment = new Payment();
 
@@ -81,14 +85,12 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_PartialPaymentExistsAndAmountPaidExceedsAmountDue()
         {
-            var payments = new List<Payment>
-            {
+            _invoicePaymentsList.Add(
                 new Payment
                 {
                     Amount = 5
-                }
-            };
-            CreateInvoice(10, payments);
+                });
+            CreateInvoice(10);
 
             var payment = new Payment()
             {
@@ -103,7 +105,7 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_NoPartialPaymentExistsAndAmountPaidExceedsInvoiceAmount()
         {
-            CreateInvoice(5, new List<Payment>());
+            CreateInvoice(5);
 
             var payment = new Payment()
             {
@@ -118,14 +120,12 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFullyPaidMessage_When_PartialPaymentExistsAndAmountPaidEqualsAmountDue()
         {
-            var payments = new List<Payment>
-            {
+            _invoicePaymentsList.Add(
                 new Payment
                 {
                     Amount = 5
-                }
-            };
-            CreateInvoice(10, payments);
+                });
+            CreateInvoice(10);
 
             var payment = new Payment()
             {
@@ -140,14 +140,12 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFullyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidEqualsInvoiceAmount()
         {
-            var payments = new List<Payment>
-            {
+            _invoicePaymentsList.Add(
                 new Payment
                 {
                     Amount = 10
-                }
-            };
-            CreateInvoice(10, payments);
+                });
+            CreateInvoice(10);
 
             var payment = new Payment()
             {
@@ -162,14 +160,12 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_PartialPaymentExistsAndAmountPaidIsLessThanAmountDue()
         {
-            var payments = new List<Payment>
-            {
+            _invoicePaymentsList.Add(
                 new Payment
                 {
                     Amount = 5
-                }
-            };
-            CreateInvoice(10, payments);
+                });
+            CreateInvoice(10);
 
             var payment = new Payment()
             {
@@ -184,7 +180,7 @@ namespace RefactorThis.Domain.Tests
         [Test]
         public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidIsLessThanInvoiceAmount()
         {
-            CreateInvoice(10, new List<Payment>());
+            CreateInvoice(10);
 
             var payment = new Payment()
             {

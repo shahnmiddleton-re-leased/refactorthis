@@ -7,10 +7,13 @@ namespace RefactorThis.Persistence
 	public class Invoice
 	{
 		private readonly IInvoiceRepository _repository;
+        private readonly IList<Payment> _payments;
+
 		public Invoice(IInvoiceRepository repository)
 		{
 			_repository = repository;
-		}
+            _payments = new List<Payment>();
+        }
 
 		public void Save( )
 		{
@@ -18,12 +21,11 @@ namespace RefactorThis.Persistence
 		}
 
 		public decimal Amount { get; set; }
-        public decimal AmountPaid => Payments.Sum(payment => payment.Amount);
-        public List<Payment> Payments { get; set; }
+        public decimal AmountPaid => _payments.Sum(payment => payment.Amount);
 
         public void AddPayment(Payment payment)
         {
-            Payments.Add(payment);
+            _payments.Add(payment);
         }
 
         public decimal PaymentPending()
