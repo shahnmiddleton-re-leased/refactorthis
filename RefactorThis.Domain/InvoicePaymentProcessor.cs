@@ -17,7 +17,7 @@ namespace RefactorThis.Domain
         {
             if (payment == null)
             {
-                throw new ArgumentNullException(nameof(payment));
+                throw new ArgumentNullException(nameof(payment), "parameter cannot be null");
             }
 
             var inv = _invoiceRepository.GetInvoice(payment.Reference);

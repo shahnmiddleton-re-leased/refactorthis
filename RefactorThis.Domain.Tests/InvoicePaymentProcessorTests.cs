@@ -191,5 +191,22 @@ namespace RefactorThis.Domain.Tests
 
             Assert.AreEqual("invoice is now partially paid", result);
         }
+
+        [Test]
+        public void ProcessPayment_Should_ThrowException_When_PaymentArgumentIsNull()
+        {
+            var failureMessage = "";
+
+            try
+            {
+                _invoicePaymentProcessor.ProcessPayment(null);
+            }
+            catch (ArgumentNullException e)
+            {
+                failureMessage = e.Message;
+            }
+
+            Assert.AreEqual("parameter cannot be null\r\nParameter name: payment", failureMessage);
+        }
     }
 }
