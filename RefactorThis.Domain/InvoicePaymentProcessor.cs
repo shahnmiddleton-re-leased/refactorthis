@@ -27,46 +27,34 @@ namespace RefactorThis.Domain
                 throw new InvalidOperationException("There is no invoice matching this payment");
             }
 
-            var responseMessage = string.Empty;
+            string responseMessage;
 
-            if (inv.Amount == 0)
-            {
-                if (inv.Payments == null || !inv.Payments.Any())
-                {
-                    responseMessage = "no payment needed";
-                }
-                else
-                {
-                    throw new InvalidOperationException(
-                        "The invoice is in an invalid state, it has an amount of 0 and it has payments.");
-                }
-            }
-            else
+            if (inv.Amount > 0)
             {
                 var pendingPayment = inv.PaymentPending();
-                if (pendingPayment > 0M)
+                if (pendingPayment > 0)
                 {
                     if (payment.Amount > pendingPayment)
                     {
                         responseMessage = (payment.Amount > inv.Amount) ? "the payment is greater than the invoice amount" : "the payment is greater than the amount remaining";
                     }
-                    else if(payment.Amount == pendingPayment)
-                    {
-                        inv.AddPayment(payment);
-                        responseMessage = "invoice is now fully paid";
-                    }
                     else
                     {
                         inv.AddPayment(payment);
-                        responseMessage = "invoice is now partially paid";
+                        responseMessage = (payment.Amount == pendingPayment) ? "invoice is now fully paid" : "invoice is now partially paid";
                     }
                 }
-                else if (pendingPayment == 0M)
+                else
                 {
                     responseMessage = "invoice was already fully paid";
                 }
 
                 inv.Save();
+            }
+            else
+            {
+                // We can also check here if we need to reverse the payment and extend this case to reverse the payment.
+                responseMessage = "no payment needed";
             }
 
             return responseMessage;

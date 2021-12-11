@@ -28,7 +28,7 @@ namespace RefactorThis.Persistence
 
         public decimal PaymentPending()
         {
-            return Amount - AmountPaid;
+            return (Amount - AmountPaid);
         }
 	}
 }
