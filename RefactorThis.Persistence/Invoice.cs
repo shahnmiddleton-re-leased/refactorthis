@@ -6,8 +6,8 @@ namespace RefactorThis.Persistence
 {
 	public class Invoice
 	{
-		private readonly InvoiceRepository _repository;
-		public Invoice( InvoiceRepository repository )
+		private readonly IInvoiceRepository _repository;
+		public Invoice(IInvoiceRepository repository)
 		{
 			_repository = repository;
 		}
