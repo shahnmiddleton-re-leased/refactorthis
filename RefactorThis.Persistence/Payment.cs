@@ -1,8 +1,13 @@
 namespace RefactorThis.Persistence
 {
+	/// <summary>
+	/// Class representation of a Payment.
+	/// </summary>
 	public class Payment
 	{
-		public decimal Amount { get; set; }
+        #region Declarations
+        public decimal Amount { get; set; }
 		public string Reference { get; set; }
-	}
+        #endregion region
+    }
 }
