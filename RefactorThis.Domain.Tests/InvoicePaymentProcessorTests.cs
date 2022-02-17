@@ -1,20 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using RefactorThis.Domain.PaymentProcessor;
+using RefactorThis.Domain.PaymentProcessor.Validators;
 using RefactorThis.Persistence;
 
 namespace RefactorThis.Domain.Tests
 {
 	[TestFixture]
 	public class InvoicePaymentProcessorTests
-	{
+    {
+        private readonly IPaymentProcessorValidator _paymentProcessorValidator;
+        public InvoicePaymentProcessorTests()
+        {
+            _paymentProcessorValidator = new PaymentProcessorValidator(new PaymentValidatorAbstractFactory());
+        }
+
 		[Test]
 		public void ProcessPayment_Should_ThrowException_When_NoInoiceFoundForPaymentReference( )
 		{
 			var repo = new InvoiceRepository( );
 
 			Invoice invoice = null;
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var paymentProcessor = new InvoicePaymentProcessor( repo, _paymentProcessorValidator);
 
 			var payment = new Payment( );
 			var failureMessage = "";
@@ -45,7 +53,7 @@ namespace RefactorThis.Domain.Tests
 
 			repo.Add( invoice );
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var paymentProcessor = new InvoicePaymentProcessor(repo, _paymentProcessorValidator);
 
 			var payment = new Payment( );
 
@@ -73,7 +81,7 @@ namespace RefactorThis.Domain.Tests
 			};
 			repo.Add( invoice );
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var paymentProcessor = new InvoicePaymentProcessor(repo, _paymentProcessorValidator);
 
 			var payment = new Payment( );
 
@@ -100,7 +108,7 @@ namespace RefactorThis.Domain.Tests
 			};
 			repo.Add( invoice );
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var paymentProcessor = new InvoicePaymentProcessor(repo, _paymentProcessorValidator);
 
 			var payment = new Payment( )
 			{
@@ -124,7 +132,7 @@ namespace RefactorThis.Domain.Tests
 			};
 			repo.Add( invoice );
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var paymentProcessor = new InvoicePaymentProcessor(repo, _paymentProcessorValidator);
 
 			var payment = new Payment( )
 			{
@@ -154,7 +162,7 @@ namespace RefactorThis.Domain.Tests
 			};
 			repo.Add( invoice );
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var paymentProcessor = new InvoicePaymentProcessor(repo, _paymentProcessorValidator);
 
 			var payment = new Payment( )
 			{
@@ -178,7 +186,7 @@ namespace RefactorThis.Domain.Tests
 			};
 			repo.Add( invoice );
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var paymentProcessor = new InvoicePaymentProcessor(repo, _paymentProcessorValidator);
 
 			var payment = new Payment( )
 			{
@@ -208,7 +216,7 @@ namespace RefactorThis.Domain.Tests
 			};
 			repo.Add( invoice );
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var paymentProcessor = new InvoicePaymentProcessor(repo, _paymentProcessorValidator);
 
 			var payment = new Payment( )
 			{
@@ -232,7 +240,7 @@ namespace RefactorThis.Domain.Tests
 			};
 			repo.Add( invoice );
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var paymentProcessor = new InvoicePaymentProcessor(repo, _paymentProcessorValidator);
 
 			var payment = new Payment( )
 			{
