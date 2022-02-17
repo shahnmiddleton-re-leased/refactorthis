@@ -4,18 +4,9 @@ namespace RefactorThis.Persistence
 {
 	public class Invoice
 	{
-		private readonly InvoiceRepository _repository;
-		public Invoice( InvoiceRepository repository )
-		{
-			_repository = repository;
-		}
-
-		public void Save( )
-		{
-			_repository.SaveInvoice( this );
-		}
-
-		public decimal Amount { get; set; }
+		
+        public String InvoiceReference { get; set; }
+        public decimal AmountDue { get; set; }
 		public decimal AmountPaid { get; set; }
 		public List<Payment> Payments { get; set; }
 	}

@@ -1,21 +1,23 @@
 namespace RefactorThis.Persistence {
 	public class InvoiceRepository
 	{
-		private Invoice _invoice;
+		
 
-		public Invoice GetInvoice( string reference )
+		public Invoice GetInvoice( String invoiceNumberReference )
 		{
-			return _invoice;
+			Invoice invoiceToBeReturned=new Invoice();
+            // fetch the invoice details as per the reference passed and store in the invoice class 
+            if(invoiceToBeReturned==null)
+                throw new InvalidOperationException( "There is no invoice matching this payment" );
+
+            return invoiceToBeReturned;
 		}
 
 		public void SaveInvoice( Invoice invoice )
 		{
-			//saves the invoice to the database
+			//saves the invoice to the database 
+            
 		}
 
-		public void Add( Invoice invoice )
-		{
-			_invoice = invoice;
-		}
 	}
 }
