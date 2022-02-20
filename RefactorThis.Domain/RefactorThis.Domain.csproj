@@ -40,6 +40,15 @@
   <ItemGroup>
     <Compile Include="Constants\PaymentMessage.cs" />
     <Compile Include="InvoicePaymentProcessor.cs" />
+    <Compile Include="PaymentRule\Interface\IPaymentRule.cs" />
+    <Compile Include="PaymentRule\Interface\IPaymentRuleRepository.cs" />
+    <Compile Include="PaymentRule\InvalidInvoiceRule.cs" />
+    <Compile Include="PaymentRule\InvoicePaymentCompleteRule.cs" />
+    <Compile Include="PaymentRule\NoInvoicePaymentRule.cs" />
+    <Compile Include="PaymentRule\NoPaymentRule.cs" />
+    <Compile Include="PaymentRule\OverPaymentThanInvoiceRule.cs" />
+    <Compile Include="PaymentRule\PartialCompleteInvoicePaymentRule.cs" />
+    <Compile Include="PaymentRule\PaymentRuleRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
