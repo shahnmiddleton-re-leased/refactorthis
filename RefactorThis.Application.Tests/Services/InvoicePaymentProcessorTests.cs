@@ -5,7 +5,7 @@ using RefactorThis.Application.Services;
 using RefactorThis.Domain.Entities.Invoice;
 using RefactorThis.Persistence;
 
-namespace RefactorThis.Domain.Tests
+namespace RefactorThis.Application.Tests.Services
 {
     [TestFixture]
     public class InvoicePaymentProcessorTests
