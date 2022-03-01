@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Abstractions\Services\IInvoicePaymentProcessor.cs" />
     <Compile Include="Common\ProcessPaymentResponse.cs" />
+    <Compile Include="Models\PaymentDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\InvoicePaymentProcessor.cs" />
   </ItemGroup>

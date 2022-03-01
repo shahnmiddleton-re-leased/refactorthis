@@ -1,9 +1,9 @@
-﻿using RefactorThis.Domain.Entities.Invoice;
+﻿using RefactorThis.Application.Models;
 
 namespace RefactorThis.Application.Abstractions.Services
 {
     public interface IInvoicePaymentProcessor
     {
-        string ProcessPayment(Payment payment);
+        string ProcessPayment(PaymentDto payment);
     }
 }

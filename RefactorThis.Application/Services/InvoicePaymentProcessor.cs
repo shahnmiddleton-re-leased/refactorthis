@@ -1,6 +1,7 @@
 ﻿using System;
 using RefactorThis.Application.Abstractions.Services;
 using RefactorThis.Application.Common;
+using RefactorThis.Application.Models;
 using RefactorThis.Domain.Abstractions.Messages;
 using RefactorThis.Domain.Abstractions.Repositories;
 using RefactorThis.Domain.Entities.Invoice;
@@ -18,24 +19,29 @@ namespace RefactorThis.Application.Services
             _invoiceRepository = invoiceRepository;
         }
 
-        public string ProcessPayment(Payment payment)
+        public string ProcessPayment(PaymentDto payment)
         {
+            if (string.IsNullOrWhiteSpace(payment.Reference))
+            {
+                throw new ArgumentException("Payment must include a reference.");
+            }
+
             var inv = _invoiceRepository.GetInvoice(payment.Reference);
 
             if (inv == null)
             {
-                throw new InvalidOperationException("There is no invoice matching this payment");
+                throw new InvalidOperationException("There is no invoice matching this payment.");
             }
 
             try
             {
-                var @event = inv.ProcessPayment(payment);
+                var @event = inv.ProcessPayment(MapPaymentDtoToPayment(payment));
 
                 // todo: publish domain event to any interested parties before persisting
 
                 _invoiceRepository.SaveInvoice(inv);
 
-                return MapDomainEventToResponse(@event);
+                return MapDomainEventToResponseString(@event);
             }
             catch (NoPaymentRequiredException)
             {
@@ -55,11 +61,16 @@ namespace RefactorThis.Application.Services
             }
         }
 
-        private static string MapDomainEventToResponse(IDomainEvent @event)
+        private static Payment MapPaymentDtoToPayment(PaymentDto payment)
+        {
+            return new Payment(payment.Amount, payment.Reference);
+        }
+
+        private static string MapDomainEventToResponseString(IDomainEvent @event)
         {
             if (!(@event is PaymentProcessed paymentProcessedEvent))
             {
-                throw new InvalidOperationException("Invalid domain event type");
+                throw new InvalidOperationException("Invalid domain event type.");
             }
 
             if (paymentProcessedEvent.IsPaidInFull)
