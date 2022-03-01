@@ -1,21 +1,29 @@
-namespace RefactorThis.Persistence {
-	public class InvoiceRepository
-	{
-		private Invoice _invoice;
+﻿using RefactorThis.Domain.Abstractions.Repositories;
+using RefactorThis.Domain.Entities.Invoice;
 
-		public Invoice GetInvoice( string reference )
-		{
-			return _invoice;
-		}
+namespace RefactorThis.Persistence
+{
+    public class InvoiceRepository : IInvoiceRepository
+    {
+        private Invoice _invoice;
 
-		public void SaveInvoice( Invoice invoice )
-		{
-			//saves the invoice to the database
-		}
+#pragma warning disable IDE0060 // Remove unused parameter
+        public Invoice GetInvoice(string reference)
+#pragma warning restore IDE0060 // Remove unused parameter
+        {
+            return _invoice;
+        }
 
-		public void Add( Invoice invoice )
-		{
-			_invoice = invoice;
-		}
-	}
+#pragma warning disable IDE0060 // Remove unused parameter
+        public void SaveInvoice(Invoice invoice)
+#pragma warning restore IDE0060 // Remove unused parameter
+        {
+            //saves the invoice to the database
+        }
+
+        public void Add(Invoice invoice)
+        {
+            _invoice = invoice;
+        }
+    }
 }
