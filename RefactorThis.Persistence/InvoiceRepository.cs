@@ -1,9 +1,9 @@
 namespace RefactorThis.Persistence {
-	public class InvoiceRepository
+	public class InvoiceRepository: IInventoryRepository
 	{
 		private Invoice _invoice;
 
-		public Invoice GetInvoice( string reference )
+		public Invoice GetInvoice(string refer)
 		{
 			return _invoice;
 		}
