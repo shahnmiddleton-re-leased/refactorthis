@@ -1,14 +1,18 @@
 using System;
 using System.Linq;
 using RefactorThis.Persistence;
+using Unity;
 
 namespace RefactorThis.Domain
 {
 	public class InvoicePaymentProcessor
 	{
-		private readonly InvoiceRepository _invoiceRepository;
+		public UnityContainer unityContainer = new UnityContainer();
 
-		public InvoicePaymentProcessor( InvoiceRepository invoiceRepository )
+		
+		private readonly IInventoryRepository _invoiceRepository;
+
+		public InvoicePaymentProcessor(IInventoryRepository invoiceRepository )
 		{
 			_invoiceRepository = invoiceRepository;
 		}

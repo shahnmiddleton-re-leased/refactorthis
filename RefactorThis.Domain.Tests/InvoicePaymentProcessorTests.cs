@@ -2,21 +2,36 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using RefactorThis.Persistence;
+using Unity;
 
 namespace RefactorThis.Domain.Tests
 {
 	[TestFixture]
 	public class InvoicePaymentProcessorTests
 	{
+		private static UnityContainer unityContainer = new UnityContainer();
+		private readonly IInventoryRepository _repo = null;
+		private readonly IModelFactory _factory = null;
+
+		static InvoicePaymentProcessorTests()
+        {
+			unityContainer.RegisterType<IInventoryRepository, InvoiceRepository>();
+			unityContainer.RegisterType<IModelFactory, ModelFactory>();
+		}
+
+		public InvoicePaymentProcessorTests(IInventoryRepository inventoryRepository, IModelFactory modelFactory)
+        {
+			_repo = inventoryRepository;
+			_factory = modelFactory;
+        }
+
 		[Test]
 		public void ProcessPayment_Should_ThrowException_When_NoInoiceFoundForPaymentReference( )
 		{
-			var repo = new InvoiceRepository( );
+			var invoice = _factory.GetInvoiceObject(_repo);
+			var paymentProcessor =_factory.GetInvoicePaymentProcessorObject( _repo );
 
-			Invoice invoice = null;
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
-
-			var payment = new Payment( );
+			var payment = _factory.GetPaymentObject();
 			var failureMessage = "";
 
 			try
@@ -34,20 +49,13 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFailureMessage_When_NoPaymentNeeded( )
 		{
-			var repo = new InvoiceRepository( );
+			var invoice = _factory.GetPopulatedInvoiceObject(_repo, null, 0, 0);			
 
-			var invoice = new Invoice( repo )
-			{
-				Amount = 0,
-				AmountPaid = 0,
-				Payments = null
-			};
+			_repo.Add( invoice );
 
-			repo.Add( invoice );
+			var paymentProcessor = _factory.GetInvoicePaymentProcessorObject(_repo);
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
-
-			var payment = new Payment( );
+			var payment = _factory.GetPaymentObject();
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
@@ -57,25 +65,20 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFailureMessage_When_InvoiceAlreadyFullyPaid( )
 		{
-			var repo = new InvoiceRepository( );
 
-			var invoice = new Invoice( repo )
-			{
-				Amount = 10,
-				AmountPaid = 10,
-				Payments = new List<Payment>
-				{
-					new Payment
-					{
-						Amount = 10
-					}
-				}
-			};
-			repo.Add( invoice );
+			var payment = _factory.GetPopulatedPaymentObject(10);
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var payments = _factory.GetPopulatedPaymentsObject(payment);
 
-			var payment = new Payment( );
+
+			var invoice = _factory.GetPopulatedInvoiceObject(_repo, payments, 10, 10);
+
+			_repo.Add( invoice );
+
+			var paymentProcessor = _factory.GetInvoicePaymentProcessorObject( _repo );
+
+			//var payment = new Payment( );
+			payment = _factory.GetPaymentObject();
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
@@ -85,27 +88,19 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFailureMessage_When_PartialPaymentExistsAndAmountPaidExceedsAmountDue( )
 		{
-			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
-			{
-				Amount = 10,
-				AmountPaid = 5,
-				Payments = new List<Payment>
-				{
-					new Payment
-					{
-						Amount = 5
-					}
-				}
-			};
-			repo.Add( invoice );
+			var payment = _factory.GetPopulatedPaymentObject(5);
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var payments = _factory.GetPopulatedPaymentsObject(payment);
 
-			var payment = new Payment( )
-			{
-				Amount = 6
-			};
+
+			var invoice = _factory.GetPopulatedInvoiceObject(_repo, payments, 10, 5);
+
+
+			_repo.Add( invoice );
+
+			var paymentProcessor = _factory.GetInvoicePaymentProcessorObject(_repo);
+
+			payment = _factory.GetPopulatedPaymentObject(6);
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
@@ -115,21 +110,18 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFailureMessage_When_NoPartialPaymentExistsAndAmountPaidExceedsInvoiceAmount( )
 		{
-			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
-			{
-				Amount = 5,
-				AmountPaid = 0,
-				Payments = new List<Payment>( )
-			};
-			repo.Add( invoice );
+			var payment = _factory.GetPopulatedPaymentObject(5);
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var payments = _factory.GetPopulatedPaymentsObject();
 
-			var payment = new Payment( )
-			{
-				Amount = 6
-			};
+
+			var invoice = _factory.GetPopulatedInvoiceObject(_repo, payments, 5, 0);
+
+			_repo.Add( invoice );
+
+			var paymentProcessor = _factory.GetInvoicePaymentProcessorObject(_repo);
+
+			payment = _factory.GetPopulatedPaymentObject(6);
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
@@ -139,27 +131,18 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFullyPaidMessage_When_PartialPaymentExistsAndAmountPaidEqualsAmountDue( )
 		{
-			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
-			{
-				Amount = 10,
-				AmountPaid = 5,
-				Payments = new List<Payment>
-				{
-					new Payment
-					{
-						Amount = 5
-					}
-				}
-			};
-			repo.Add( invoice );
+			var payment = _factory.GetPopulatedPaymentObject(5);
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var payments = _factory.GetPopulatedPaymentsObject();
 
-			var payment = new Payment( )
-			{
-				Amount = 5
-			};
+
+			var invoice = _factory.GetPopulatedInvoiceObject(_repo, payments, 10, 5);
+
+			_repo.Add( invoice );
+
+			var paymentProcessor = _factory.GetInvoicePaymentProcessorObject(_repo);
+
+			payment = _factory.GetPopulatedPaymentObject(6);
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
@@ -169,21 +152,18 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFullyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidEqualsInvoiceAmount( )
 		{
-			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
-			{
-				Amount = 10,
-				AmountPaid = 0,
-				Payments = new List<Payment>( ) { new Payment( ) { Amount = 10 } }
-			};
-			repo.Add( invoice );
+			var payment = _factory.GetPopulatedPaymentObject(10);
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var payments = _factory.GetPopulatedPaymentsObject();
 
-			var payment = new Payment( )
-			{
-				Amount = 10
-			};
+
+			var invoice = _factory.GetPopulatedInvoiceObject(_repo, payments, 10, 0);
+
+			_repo.Add( invoice );
+
+			var paymentProcessor = _factory.GetInvoicePaymentProcessorObject(_repo);
+
+			payment = _factory.GetPopulatedPaymentObject(10);
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
@@ -193,27 +173,18 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_PartialPaymentExistsAndAmountPaidIsLessThanAmountDue( )
 		{
-			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
-			{
-				Amount = 10,
-				AmountPaid = 5,
-				Payments = new List<Payment>
-				{
-					new Payment
-					{
-						Amount = 5
-					}
-				}
-			};
-			repo.Add( invoice );
+			var payment = _factory.GetPopulatedPaymentObject(5);
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var payments = _factory.GetPopulatedPaymentsObject();
 
-			var payment = new Payment( )
-			{
-				Amount = 1
-			};
+
+			var invoice = _factory.GetPopulatedInvoiceObject(_repo, payments, 10, 5);
+
+			_repo.Add( invoice );
+
+			var paymentProcessor = _factory.GetInvoicePaymentProcessorObject(_repo);
+
+			payment = _factory.GetPopulatedPaymentObject(1);
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
@@ -223,21 +194,17 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidIsLessThanInvoiceAmount( )
 		{
-			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
-			{
-				Amount = 10,
-				AmountPaid = 0,
-				Payments = new List<Payment>( )
-			};
-			repo.Add( invoice );
+			var payment = _factory.GetPopulatedPaymentObject(1);
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var payments = _factory.GetPopulatedPaymentsObject();
 
-			var payment = new Payment( )
-			{
-				Amount = 1
-			};
+
+			var invoice = _factory.GetPopulatedInvoiceObject(_repo, payments, 10, 0);
+
+			_repo.Add( invoice );
+
+			var paymentProcessor = _factory.GetInvoicePaymentProcessorObject(_repo);
+
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
