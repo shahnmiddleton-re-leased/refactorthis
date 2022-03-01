@@ -48,7 +48,7 @@ namespace RefactorThis.Domain.Tests.Entities.Invoice
                 new Payment(100, "ref") });
 
             var ex = Assert.Throws<ArgumentException>(Action);
-            Assert.That(ex.Message, Is.EqualTo("Total payments must be less than or equal to amount."));
+            Assert.That(ex.Message, Is.EqualTo("Amount paid must be less than or equal to amount."));
         }
 
         [Test]

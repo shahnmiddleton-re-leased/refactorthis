@@ -17,16 +17,14 @@ namespace RefactorThis.Domain.Entities.Invoice
                 throw new ArgumentException("Amount must be greater than zero.");
             }
 
-            var paymentsSum = payments.Sum(p => p.Amount);
-
-            if (paymentsSum != amountPaid)
+            if (payments.Sum(p => p.Amount) != amountPaid)
             {
                 throw new ArgumentException("Total payments must equal amount paid.");
             }
 
-            if (paymentsSum > amount)
+            if (amountPaid > amount)
             {
-                throw new ArgumentException("Total payments must be less than or equal to amount.");
+                throw new ArgumentException("Amount paid must be less than or equal to amount.");
             }
 
             Amount = amount;
@@ -40,7 +38,7 @@ namespace RefactorThis.Domain.Entities.Invoice
         /// Processes a payment on an invoice.
         /// </summary>
         /// <param name="payment">The payment to process.</param>
-        /// <returns>A domain event that occurs during this procedure.</returns>
+        /// <returns>A domain event.</returns>
         public IDomainEvent ProcessPayment(Payment payment)
         {
             // validate arguments
