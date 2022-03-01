@@ -11,7 +11,15 @@ namespace RefactorThis.Application.Tests.Services
     public class InvoicePaymentProcessorTests
     {
         [Test]
-        public void ProcessPayment_Should_ThrowException_When_NoInoiceFoundForPaymentReference()
+        public void InvoicePaymentProcessor_Should_ThrowException_When_RepoIsNull()
+        {
+            void Action() => new InvoicePaymentProcessor(null);
+
+            Assert.Throws<ArgumentNullException>(Action);
+        }
+
+        [Test]
+        public void InvoicePaymentProcessor_Should_ThrowException_When_NoInoiceFoundForPaymentReference()
         {
             var repo = new InvoiceRepository();
 
@@ -33,7 +41,7 @@ namespace RefactorThis.Application.Tests.Services
         }
 
         //[Test]
-        //public void ProcessPayment_Should_ReturnFailureMessage_When_NoPaymentNeeded()
+        //public void InvoicePaymentProcessor_Should_ReturnFailureMessage_When_NoPaymentNeeded()
         //{
         //    var repo = new InvoiceRepository();
 
@@ -56,7 +64,7 @@ namespace RefactorThis.Application.Tests.Services
         //}
 
         [Test]
-        public void ProcessPayment_Should_ReturnFailureMessage_When_InvoiceAlreadyFullyPaid()
+        public void InvoicePaymentProcessor_Should_ReturnFailureMessage_When_InvoiceAlreadyFullyPaid()
         {
             var repo = new InvoiceRepository();
 
@@ -78,7 +86,7 @@ namespace RefactorThis.Application.Tests.Services
         }
 
         [Test]
-        public void ProcessPayment_Should_ReturnFailureMessage_When_PartialPaymentExistsAndAmountPaidExceedsAmountDue()
+        public void InvoicePaymentProcessor_Should_ReturnFailureMessage_When_PartialPaymentExistsAndAmountPaidExceedsAmountDue()
         {
             var repo = new InvoiceRepository();
             var invoice = new Invoice(10, 5,
@@ -99,7 +107,7 @@ namespace RefactorThis.Application.Tests.Services
         }
 
         [Test]
-        public void ProcessPayment_Should_ReturnFailureMessage_When_NoPartialPaymentExistsAndAmountPaidExceedsInvoiceAmount()
+        public void InvoicePaymentProcessor_Should_ReturnFailureMessage_When_NoPartialPaymentExistsAndAmountPaidExceedsInvoiceAmount()
         {
             var repo = new InvoiceRepository();
             var invoice = new Invoice(5, 0,
@@ -117,7 +125,7 @@ namespace RefactorThis.Application.Tests.Services
         }
 
         [Test]
-        public void ProcessPayment_Should_ReturnFullyPaidMessage_When_PartialPaymentExistsAndAmountPaidEqualsAmountDue()
+        public void InvoicePaymentProcessor_Should_ReturnFullyPaidMessage_When_PartialPaymentExistsAndAmountPaidEqualsAmountDue()
         {
             var repo = new InvoiceRepository();
             var invoice = new Invoice(10, 5,
@@ -138,7 +146,7 @@ namespace RefactorThis.Application.Tests.Services
         }
 
         [Test]
-        public void ProcessPayment_Should_ReturnFullyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidEqualsInvoiceAmount()
+        public void InvoicePaymentProcessor_Should_ReturnFullyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidEqualsInvoiceAmount()
         {
             var repo = new InvoiceRepository();
             var invoice = new Invoice(10, 10,
@@ -159,7 +167,7 @@ namespace RefactorThis.Application.Tests.Services
         }
 
         [Test]
-        public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_PartialPaymentExistsAndAmountPaidIsLessThanAmountDue()
+        public void InvoicePaymentProcessor_Should_ReturnPartiallyPaidMessage_When_PartialPaymentExistsAndAmountPaidIsLessThanAmountDue()
         {
             var repo = new InvoiceRepository();
             var invoice = new Invoice(10, 5,
@@ -180,7 +188,7 @@ namespace RefactorThis.Application.Tests.Services
         }
 
         [Test]
-        public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidIsLessThanInvoiceAmount()
+        public void InvoicePaymentProcessor_Should_ReturnPartiallyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidIsLessThanInvoiceAmount()
         {
             var repo = new InvoiceRepository();
             var invoice = new Invoice(10, 0,

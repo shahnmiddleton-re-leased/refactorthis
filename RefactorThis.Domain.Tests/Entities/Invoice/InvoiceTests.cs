@@ -14,6 +14,14 @@ namespace RefactorThis.Domain.Tests.Entities.Invoice
         private EntitiesInvoice.Invoice _target;
 
         [Test]
+        public void Instantiate_Should_ThrowAnException_When_PaymentsIsNull()
+        {
+            void Action() => _target = new EntitiesInvoice.Invoice(0, 100, null);
+
+            Assert.Throws<ArgumentNullException>(Action);
+        }
+
+        [Test]
         public void Instantiate_Should_ThrowAnException_When_InvoiceIsZero()
         {
             void Action() => _target = new EntitiesInvoice.Invoice(0, 100, new List<Payment> {
@@ -41,6 +49,17 @@ namespace RefactorThis.Domain.Tests.Entities.Invoice
 
             var ex = Assert.Throws<ArgumentException>(Action);
             Assert.That(ex.Message, Is.EqualTo("Total payments must be less than or equal to amount."));
+        }
+
+        [Test]
+        public void ProcessPayment_Should_ThrowAnException_When_PaymentIsNull()
+        {
+            _target = new EntitiesInvoice.Invoice(100, 50, new List<Payment> {
+                new Payment(50, "ref") });
+
+            void Action() => _target.ProcessPayment(null);
+
+            Assert.Throws<ArgumentNullException>(Action);
         }
 
         [Test]
