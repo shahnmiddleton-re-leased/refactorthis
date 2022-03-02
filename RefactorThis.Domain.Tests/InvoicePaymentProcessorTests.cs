@@ -173,8 +173,7 @@ namespace RefactorThis.Domain.Tests
 			var invoice = new Invoice( repo )
 			{
 				Amount = 10,
-				AmountPaid = 0,
-				Payments = new List<Payment>( ) { new Payment( ) { Amount = 10 } }
+				AmountPaid = 0,				
 			};
 			repo.Add( invoice );
 
@@ -187,7 +186,7 @@ namespace RefactorThis.Domain.Tests
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
-			Assert.AreEqual( "invoice was already fully paid", result );
+			Assert.AreEqual("invoice is now fully paid", result );
 		}
 
 		[Test]

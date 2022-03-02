@@ -16,7 +16,7 @@ namespace RefactorThis.Domain.PaymentHandlers
             payload.SkipRestHandlers = true;
             if (payload.Invoice.AmountPaid != (payload.Invoice.Payments?.Sum(x => x.Amount) ?? 0))
             {
-                payload.Response = "Invoice amount and payments not matching.";
+                payload.Response = "Invoice amount and payments not matching";
                 return;
             }
 

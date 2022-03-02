@@ -8,6 +8,7 @@ namespace RefactorThis.Persistence
 		public Invoice( InvoiceRepository repository )
 		{
 			_repository = repository;
+			Payments = new List<Payment>();
 		}
 
 		public void Save( )
