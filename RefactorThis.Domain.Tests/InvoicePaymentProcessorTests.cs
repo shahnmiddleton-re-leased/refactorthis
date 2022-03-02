@@ -190,6 +190,30 @@ namespace RefactorThis.Domain.Tests
 		}
 
 		[Test]
+		public void ProcessPayment_Should_ReturnNotMatchingMessage_When_InvoiceAmountPaidNotEqualsPaymentsOnInvoice()
+		{
+			var repo = new InvoiceRepository();
+			var invoice = new Invoice(repo)
+			{
+				Amount = 10,
+				AmountPaid = 0,
+				Payments = new List<Payment>() { new Payment() { Amount = 10 } }
+			};
+			repo.Add(invoice);
+
+			var paymentProcessor = new InvoicePaymentProcessor(repo);
+
+			var payment = new Payment()
+			{
+				Amount = 10
+			};
+
+			var result = paymentProcessor.ProcessPayment(payment);
+
+			Assert.AreEqual("Invoice amount and payments not matching", result);
+		}
+
+		[Test]
 		public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_PartialPaymentExistsAndAmountPaidIsLessThanAmountDue( )
 		{
 			var repo = new InvoiceRepository( );
