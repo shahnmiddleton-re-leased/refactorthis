@@ -13,7 +13,6 @@ namespace RefactorThis.Domain.Tests
 		{
 			var repo = new InvoiceRepository( );
 
-			Invoice invoice = null;
 			var paymentProcessor = new InvoicePaymentProcessor( repo );
 
 			var payment = new Payment( );
@@ -21,7 +20,7 @@ namespace RefactorThis.Domain.Tests
 
 			try
 			{
-				var result = paymentProcessor.ProcessPayment( payment );
+				paymentProcessor.ProcessPayment( payment );
 			}
 			catch ( InvalidOperationException e )
 			{
@@ -36,12 +35,7 @@ namespace RefactorThis.Domain.Tests
 		{
 			var repo = new InvoiceRepository( );
 
-			var invoice = new Invoice( repo )
-			{
-				Amount = 0,
-				AmountPaid = 0,
-				Payments = null
-			};
+			var invoice = Invoice.Create(repo, 0, 0, null);
 
 			repo.Add( invoice );
 
@@ -59,18 +53,16 @@ namespace RefactorThis.Domain.Tests
 		{
 			var repo = new InvoiceRepository( );
 
-			var invoice = new Invoice( repo )
+			var payments = new List<Payment>
 			{
-				Amount = 10,
-				AmountPaid = 10,
-				Payments = new List<Payment>
+				new Payment
 				{
-					new Payment
-					{
-						Amount = 10
-					}
+					Amount = 10
 				}
 			};
+
+			var invoice = Invoice.Create(repo, 10, 10, payments);
+
 			repo.Add( invoice );
 
 			var paymentProcessor = new InvoicePaymentProcessor( repo );
@@ -86,18 +78,16 @@ namespace RefactorThis.Domain.Tests
 		public void ProcessPayment_Should_ReturnFailureMessage_When_PartialPaymentExistsAndAmountPaidExceedsAmountDue( )
 		{
 			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
-			{
-				Amount = 10,
-				AmountPaid = 5,
-				Payments = new List<Payment>
+			var payments = new List<Payment>
 				{
 					new Payment
 					{
 						Amount = 5
 					}
-				}
-			};
+				};
+
+
+			var invoice = Invoice.Create(repo, 10, 5, payments);
 			repo.Add( invoice );
 
 			var paymentProcessor = new InvoicePaymentProcessor( repo );
@@ -116,12 +106,9 @@ namespace RefactorThis.Domain.Tests
 		public void ProcessPayment_Should_ReturnFailureMessage_When_NoPartialPaymentExistsAndAmountPaidExceedsInvoiceAmount( )
 		{
 			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
-			{
-				Amount = 5,
-				AmountPaid = 0,
-				Payments = new List<Payment>( )
-			};
+			var payments = new List<Payment>();
+
+			var invoice = Invoice.Create(repo, 5, 0, payments);
 			repo.Add( invoice );
 
 			var paymentProcessor = new InvoicePaymentProcessor( repo );
@@ -140,18 +127,15 @@ namespace RefactorThis.Domain.Tests
 		public void ProcessPayment_Should_ReturnFullyPaidMessage_When_PartialPaymentExistsAndAmountPaidEqualsAmountDue( )
 		{
 			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
-			{
-				Amount = 10,
-				AmountPaid = 5,
-				Payments = new List<Payment>
+			var payments = new List<Payment>
 				{
 					new Payment
 					{
 						Amount = 5
 					}
-				}
-			};
+				};
+
+			var invoice = Invoice.Create(repo, 10, 5, payments);
 			repo.Add( invoice );
 
 			var paymentProcessor = new InvoicePaymentProcessor( repo );
@@ -170,12 +154,16 @@ namespace RefactorThis.Domain.Tests
 		public void ProcessPayment_Should_ReturnFullyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidEqualsInvoiceAmount( )
 		{
 			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
-			{
-				Amount = 10,
-				AmountPaid = 0,
-				Payments = new List<Payment>( ) { new Payment( ) { Amount = 10 } }
-			};
+			var payments = new List<Payment>
+				{
+					new Payment
+					{
+						Amount = 10
+					}
+				};
+
+
+			var invoice = Invoice.Create(repo, 10, 0, payments);
 			repo.Add( invoice );
 
 			var paymentProcessor = new InvoicePaymentProcessor( repo );
@@ -194,18 +182,15 @@ namespace RefactorThis.Domain.Tests
 		public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_PartialPaymentExistsAndAmountPaidIsLessThanAmountDue( )
 		{
 			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
-			{
-				Amount = 10,
-				AmountPaid = 5,
-				Payments = new List<Payment>
+			var payments = new List<Payment>
 				{
 					new Payment
 					{
 						Amount = 5
 					}
-				}
-			};
+				};
+
+			var invoice = Invoice.Create(repo, 10, 5, payments);
 			repo.Add( invoice );
 
 			var paymentProcessor = new InvoicePaymentProcessor( repo );
@@ -224,12 +209,9 @@ namespace RefactorThis.Domain.Tests
 		public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidIsLessThanInvoiceAmount( )
 		{
 			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
-			{
-				Amount = 10,
-				AmountPaid = 0,
-				Payments = new List<Payment>( )
-			};
+			var payments = new List<Payment>();
+
+			var invoice = Invoice.Create(repo, 10, 0, payments);
 			repo.Add( invoice );
 
 			var paymentProcessor = new InvoicePaymentProcessor( repo );
