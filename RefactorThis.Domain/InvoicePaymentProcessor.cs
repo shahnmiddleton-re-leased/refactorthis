@@ -1,94 +1,104 @@
-using System;
-using System.Linq;
+﻿using Microsoft.Extensions.Logging;
+using RefactorThis.Domain.Constants;
 using RefactorThis.Persistence;
+using System;
+using System.Collections.Generic;
 
 namespace RefactorThis.Domain
 {
-	public class InvoicePaymentProcessor
-	{
-		private readonly InvoiceRepository _invoiceRepository;
+    public class InvoicePaymentProcessor
+    {
+        private readonly ILogger<InvoicePaymentProcessor> _logger;
+        private readonly InvoiceValidator _invoiceValidator;
+        private readonly PaymentValidator _paymentValidator;
+        private readonly IInvoiceRepository _invoiceRepository;
 
-		public InvoicePaymentProcessor( InvoiceRepository invoiceRepository )
-		{
-			_invoiceRepository = invoiceRepository;
-		}
+        public InvoicePaymentProcessor(
+            ILogger<InvoicePaymentProcessor> logger,
+            InvoiceValidator invoiceProcessor,
+            PaymentValidator paymentValidator,
+            IInvoiceRepository invoiceRepository)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _invoiceValidator = invoiceProcessor ?? throw new ArgumentNullException(nameof(invoiceProcessor));
+            _paymentValidator = paymentValidator ?? throw new ArgumentNullException(nameof(paymentValidator));
+            _invoiceRepository = invoiceRepository ?? throw new ArgumentNullException(nameof(invoiceRepository));
+        }
 
-		public string ProcessPayment( Payment payment )
-		{
-			var inv = _invoiceRepository.GetInvoice( payment.Reference );
+        public string ProcessPayment(Payment payment)
+        {
+            _paymentValidator.PreValidatePayment(payment);
+            
+            using (_logger.BeginScope(new Dictionary<string, string> { ["ReferenceID"] = payment.Reference }))
+            {
+                return ProcessPaymentWithScopedLogging(payment);
+            }
+        }
 
-			var responseMessage = string.Empty;
+        private string ProcessPaymentWithScopedLogging(Payment payment)
+        {
+            _logger.LogInformation("Processing payment");
 
-			if ( inv == null )
-			{
-				throw new InvalidOperationException( "There is no invoice matching this payment" );
-			}
-			else
-			{
-				if ( inv.Amount == 0 )
-				{
-					if ( inv.Payments == null || !inv.Payments.Any( ) )
-					{
-						responseMessage = "no payment needed";
-					}
-					else
-					{
-						throw new InvalidOperationException( "The invoice is in an invalid state, it has an amount of 0 and it has payments." );
-					}
-				}
-				else
-				{
-					if ( inv.Payments != null && inv.Payments.Any( ) )
-					{
-						if ( inv.Payments.Sum( x => x.Amount ) != 0 && inv.Amount == inv.Payments.Sum( x => x.Amount ) )
-						{
-							responseMessage = "invoice was already fully paid";
-						}
-						else if ( inv.Payments.Sum( x => x.Amount ) != 0 && payment.Amount > ( inv.Amount - inv.AmountPaid ) )
-						{
-							responseMessage = "the payment is greater than the partial amount remaining";
-						}
-						else
-						{
-							if ( ( inv.Amount - inv.AmountPaid ) == payment.Amount )
-							{
-								inv.AmountPaid += payment.Amount;
-								inv.Payments.Add( payment );
-								responseMessage = "final partial payment received, invoice is now fully paid";
-							}
-							else
-							{
-								inv.AmountPaid += payment.Amount;
-								inv.Payments.Add( payment );
-								responseMessage = "another partial payment received, still not fully paid";
-							}
-						}
-					}
-					else
-					{
-						if ( payment.Amount > inv.Amount )
-						{
-							responseMessage = "the payment is greater than the invoice amount";
-						}
-						else if ( inv.Amount == payment.Amount )
-						{
-							inv.AmountPaid = payment.Amount;
-							inv.Payments.Add( payment );
-							responseMessage = "invoice is now fully paid";
-						}
-						else
-						{
-							inv.AmountPaid = payment.Amount;
-							inv.Payments.Add( payment );
-							responseMessage = "invoice is now partially paid";
-						}
-					}
-				}
-			}
-			
-			inv.Save();
+            Invoice invoice = _invoiceRepository.GetInvoice(payment.Reference);
 
-			return responseMessage;
-		}
-	}
+            _invoiceValidator.PreValidateInvoice(invoice);
+
+            string paymentResult = PaymentResultMessage.NoPaymentNeeded;
+            
+            if (_invoiceValidator.DoesInvoiceRequireProcessing(invoice))
+            {
+                paymentResult = DeterminePaymentResult(invoice, payment);
+
+                _invoiceRepository.SaveInvoice(invoice);
+            }
+            else
+            {
+                _logger.LogInformation("Invoice does not require payment");
+            }
+
+            return paymentResult;
+        }
+
+        private string DeterminePaymentResult(Invoice invoice, Payment payment)
+        {
+            string partialPaymentResult;
+            
+            bool isFirstPayment = !_invoiceValidator.DoesInvoiceHavingExistingPayments(invoice);
+
+            if (_invoiceValidator.HasInvoiceBeenPaidInFull(invoice))
+            {
+                _logger.LogInformation("Invoice has already been paid - no payment required");
+                partialPaymentResult = PaymentResultMessage.InvoiceAlreadyFullyPaid;
+            }
+            else if (_invoiceValidator.DoesPaymentExceedRemainingBalance(invoice, payment))
+            {
+                _logger.LogInformation("Payment of {Payment} exceeds the remaining balance {RemainingBalance}", payment.Amount, invoice.RemainingBalance);
+                partialPaymentResult = PaymentResultMessage.PaymentExceedsRemainingBalance(isFirstPayment);
+            }
+            else
+            {
+                partialPaymentResult = MakePaymentToInvoice(invoice, payment, isFirstPayment);
+            }
+
+            return partialPaymentResult;
+        }
+
+        private string MakePaymentToInvoice(Invoice invoice, Payment payment, bool isFirstPayment)
+        {
+            invoice.Payments.Add(payment);
+
+            _logger.LogInformation("Payment of {Amount} has been paid", payment.Amount);
+
+            if (_invoiceValidator.HasInvoiceBeenPaidInFull(invoice))
+            {
+                _logger.LogInformation("Invoice has been paid in full.");
+                return PaymentResultMessage.PaymentComplete(isFirstPayment);
+            }
+            else
+            {
+                _logger.LogInformation("Balance of {RemainingBalance} is still outstanding", invoice.RemainingBalance);
+                return PaymentResultMessage.PaymentReceived(isFirstPayment);
+            }
+        }
+    }
 }
