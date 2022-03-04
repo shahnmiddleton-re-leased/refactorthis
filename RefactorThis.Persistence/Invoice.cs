@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 namespace RefactorThis.Persistence
 {
+	/*
 	public class Invoice
 	{
 		private readonly InvoiceRepository _repository;
@@ -19,4 +20,5 @@ namespace RefactorThis.Persistence
 		public decimal AmountPaid { get; set; }
 		public List<Payment> Payments { get; set; }
 	}
+	*/
 }

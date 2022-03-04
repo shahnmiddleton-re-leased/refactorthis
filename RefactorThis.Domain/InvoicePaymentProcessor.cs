@@ -1,16 +1,18 @@
 using System;
 using System.Linq;
 using RefactorThis.Persistence;
+using RefactorThis.Persistence.Interfaces;
+using RefactorThis.Persistence.Model;
 
 namespace RefactorThis.Domain
 {
 	public class InvoicePaymentProcessor
 	{
-		private readonly InvoiceRepository _invoiceRepository;
+        private readonly IFinancialsService _financialsService;
 
-		public InvoicePaymentProcessor( InvoiceRepository invoiceRepository )
+        public InvoicePaymentProcessor(IFinancialsService financialsService)
 		{
-			_invoiceRepository = invoiceRepository;
+            this._financialsService = financialsService;
 		}
 
         /// <summary>
@@ -26,7 +28,7 @@ namespace RefactorThis.Domain
                 if (payment is null) { throw new ArgumentNullException(paramName: nameof(payment)); }
 
                 // Get invoice by payment reference.
-                var invoice = _invoiceRepository.GetInvoice(payment.Reference);
+                var invoice = _financialsService.GetInvoice(payment.Reference);
 
                 // Invoice null reference check.
                 if (invoice is null) { throw new InvalidOperationException("There is no invoice matching this payment"); }
@@ -99,7 +101,7 @@ namespace RefactorThis.Domain
             {
                 invoice.AmountPaid += payment.Amount;
                 invoice.Payments.Add(payment);
-                invoice.Save();
+                _financialsService.SaveInvoice(invoice);
             }
             catch (Exception ex) { throw ex; }
         }
