@@ -13,7 +13,7 @@ namespace RefactorThis.Persistence.Classes
         Invoice _invoice;
         public void Add(Invoice invoice)
         {
-            _invoice = invoice;
+            _invoice = invoice;         //Actually it will come from database.. adding here to make it work.
         }
 
         public Invoice GetInvoice(string reference)
