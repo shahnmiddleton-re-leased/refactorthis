@@ -31,14 +31,14 @@ namespace RefactorThis.Domain
                 var invoice = _financialsService.GetInvoice(payment.Reference);
 
                 // Invoice null reference check.
-                if (invoice is null) { throw new InvalidOperationException("There is no invoice matching this payment"); }
+                if (invoice is null) { throw new InvalidOperationException("There is no invoice matching this payment."); }
                 else
                 {
                     // When invoice amount is 0;
                     if (invoice.Amount == 0)
                     {
                         // No payments attached for this invoice;
-                        if (invoice.Payments is null || invoice.Payments.Count == 0) { return "No payment needed"; }
+                        if (invoice.Payments is null || invoice.Payments.Count == 0) { return "No payment needed."; }
                         else { throw new InvalidOperationException("The invoice is in an invalid state, it has an amount of 0 and it has payments."); }
                     }
                     else
@@ -52,7 +52,7 @@ namespace RefactorThis.Domain
 
                             if (invoicePaymentsSum != 0 && invoice.Amount == invoicePaymentsSum)    // When invoice amount and invoice payments sum are equal.
                             {
-                                return "Invoice was already fully paid";
+                                return "Invoice was already fully paid.";
                             }
                             else if (invoicePaymentsSum != 0 && payment.Amount > invRemainingAmount) // When current payment amount is greater than invoice remaining amount.
                             {
@@ -61,7 +61,7 @@ namespace RefactorThis.Domain
                             else if (payment.Amount == invRemainingAmount)  // When current payment amount is equal to invoice remaining amount.
                             {
                                 AddPaymentToInvoice(invoice, payment);
-                                return $"Final partial payment {payment.Amount} received, invoice is now fully paid";
+                                return $"Final partial payment {payment.Amount} received, invoice is now fully paid.";
                             }
                             else
                             {
@@ -80,13 +80,13 @@ namespace RefactorThis.Domain
                             else if (invoice.Amount == payment.Amount) // When invoice amount equal payment amount.
                             {
                                 AddPaymentToInvoice(invoice, payment);
-                                return "Invoice is now fully paid";
+                                return "Invoice is now fully paid.";
                             }
                             else
                             {
                                 // Partial payment received, adding payment to invoice.
                                 AddPaymentToInvoice(invoice, payment);
-                                return "Invoice is now partially paid";
+                                return "Invoice is now partially paid.";
                             }
                         }
                     }
