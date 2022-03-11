@@ -13,7 +13,6 @@ namespace RefactorThis.Domain.Tests
         {
             var repo = new InvoiceRepository();
 
-            Invoice invoice = null;
             var paymentProcessor = new InvoicePaymentProcessor(repo);
 
             var payment = new Payment();
@@ -42,7 +41,6 @@ namespace RefactorThis.Domain.Tests
                 AmountPaid = 0,
                 Payments = new List<Payment>
                 {
-                    new Payment { Amount = 10, Reference = "ref" }
                 }
             };
 
@@ -188,7 +186,7 @@ namespace RefactorThis.Domain.Tests
                 Amount = 10
             };
 
-            var result = paymentProcessor.ProcessThePayment(payment);
+            var result = paymentProcessor.ProcessPayment(payment);
 
             Assert.AreEqual("invoice was already fully paid", result);
         }
@@ -218,7 +216,7 @@ namespace RefactorThis.Domain.Tests
                 Amount = 1
             };
 
-            var result = paymentProcessor.ProcessThePayment(payment);
+            var result = paymentProcessor.ProcessPayment(payment);
 
             Assert.AreEqual("another partial payment received, still not fully paid", result);
         }
@@ -242,7 +240,7 @@ namespace RefactorThis.Domain.Tests
                 Amount = 1
             };
 
-            var result = paymentProcessor.ProcessThePayment(payment);
+            var result = paymentProcessor.ProcessPayment(payment);
 
             Assert.AreEqual("invoice is now partially paid", result);
         }
