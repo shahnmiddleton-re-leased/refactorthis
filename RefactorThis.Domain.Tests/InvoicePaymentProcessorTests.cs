@@ -11,12 +11,14 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ThrowException_When_NoInoiceFoundForPaymentReference( )
 		{
-			var repo = new InvoiceRepository( );
+			var paymentProcessor = new InvoicePaymentProcessor();
+			const string refKey = "INVOICE000";
 
-			Invoice invoice = null;
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
-
-			var payment = new Payment( );
+			var payment = new Payment( )
+			{
+				Amount = 5,
+				Reference = refKey
+			};
 			var failureMessage = "";
 
 			try
@@ -34,20 +36,23 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFailureMessage_When_NoPaymentNeeded( )
 		{
-			var repo = new InvoiceRepository( );
+			var repo = InvoiceRepository.GetInvoiceRepository();
+			const string refKey = "INVOICE001";
 
-			var invoice = new Invoice( repo )
+			var invoice = new Invoice( )
 			{
-				Amount = 0,
-				AmountPaid = 0,
-				Payments = null
+				Amount = 0
 			};
 
-			repo.Add( invoice );
+			repo.Add( refKey, invoice );
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
-
-			var payment = new Payment( );
+			var paymentProcessor = new InvoicePaymentProcessor( );
+			
+			var payment = new Payment( )
+			{
+				Amount = 5,
+				Reference = refKey
+			};
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
@@ -57,25 +62,28 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFailureMessage_When_InvoiceAlreadyFullyPaid( )
 		{
-			var repo = new InvoiceRepository( );
-
-			var invoice = new Invoice( repo )
+			var repo = InvoiceRepository.GetInvoiceRepository();
+			const string refKey = "INVOICE002";
+			
+			var invoice = new Invoice()
+			{
+				Amount = 10
+			};
+			invoice.AddPayment(new Payment
 			{
 				Amount = 10,
-				AmountPaid = 10,
-				Payments = new List<Payment>
-				{
-					new Payment
-					{
-						Amount = 10
-					}
-				}
+				Reference = refKey
+			});
+			
+			repo.Add( refKey,invoice );
+
+			var paymentProcessor = new InvoicePaymentProcessor();
+
+			var payment = new Payment( )
+			{
+				Amount = 5,
+				Reference = refKey
 			};
-			repo.Add( invoice );
-
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
-
-			var payment = new Payment( );
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
@@ -85,26 +93,27 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFailureMessage_When_PartialPaymentExistsAndAmountPaidExceedsAmountDue( )
 		{
-			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
+			var repo = InvoiceRepository.GetInvoiceRepository();
+			const string refKey = "INVOICE003";
+			
+			var invoice = new Invoice()
 			{
-				Amount = 10,
-				AmountPaid = 5,
-				Payments = new List<Payment>
-				{
-					new Payment
-					{
-						Amount = 5
-					}
-				}
+				Amount = 10
 			};
-			repo.Add( invoice );
+			invoice.AddPayment(new Payment
+			{
+				Amount = 5,
+				Reference = refKey
+			});
+			
+			repo.Add( refKey, invoice );
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var paymentProcessor = new InvoicePaymentProcessor();
 
 			var payment = new Payment( )
 			{
-				Amount = 6
+				Amount = 6,
+				Reference = refKey
 			};
 
 			var result = paymentProcessor.ProcessPayment( payment );
@@ -115,20 +124,21 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFailureMessage_When_NoPartialPaymentExistsAndAmountPaidExceedsInvoiceAmount( )
 		{
-			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
+			var repo = InvoiceRepository.GetInvoiceRepository();
+			const string refKey = "INVOICE004";
+			
+			var invoice = new Invoice()
 			{
-				Amount = 5,
-				AmountPaid = 0,
-				Payments = new List<Payment>( )
+				Amount = 5
 			};
-			repo.Add( invoice );
+			repo.Add( refKey, invoice );
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var paymentProcessor = new InvoicePaymentProcessor();
 
 			var payment = new Payment( )
 			{
-				Amount = 6
+				Amount = 6,
+				Reference = refKey
 			};
 
 			var result = paymentProcessor.ProcessPayment( payment );
@@ -139,26 +149,27 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFullyPaidMessage_When_PartialPaymentExistsAndAmountPaidEqualsAmountDue( )
 		{
-			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
+			var repo = InvoiceRepository.GetInvoiceRepository();
+			const string refKey = "INVOICE006";
+			
+			var invoice = new Invoice()
 			{
-				Amount = 10,
-				AmountPaid = 5,
-				Payments = new List<Payment>
-				{
-					new Payment
-					{
-						Amount = 5
-					}
-				}
+				Amount = 10
 			};
-			repo.Add( invoice );
+			
+			invoice.AddPayment(new Payment
+			{
+				Amount = 5
+			});
+			
+			repo.Add( refKey, invoice );
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var paymentProcessor = new InvoicePaymentProcessor();
 
 			var payment = new Payment( )
 			{
-				Amount = 5
+				Amount = 5,
+				Reference = refKey
 			};
 
 			var result = paymentProcessor.ProcessPayment( payment );
@@ -169,20 +180,23 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnFullyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidEqualsInvoiceAmount( )
 		{
-			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
+			var repo = InvoiceRepository.GetInvoiceRepository();
+			const string refKey = "INVOICE007";
+			
+			var invoice = new Invoice()
 			{
-				Amount = 10,
-				AmountPaid = 0,
-				Payments = new List<Payment>( ) { new Payment( ) { Amount = 10 } }
+				Amount = 10
 			};
-			repo.Add( invoice );
+			invoice.AddPayment(new Payment() {Amount = 10});
+			
+			repo.Add( refKey, invoice );
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var paymentProcessor = new InvoicePaymentProcessor();
 
 			var payment = new Payment( )
 			{
-				Amount = 10
+				Amount = 10,
+				Reference = refKey
 			};
 
 			var result = paymentProcessor.ProcessPayment( payment );
@@ -193,26 +207,26 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_PartialPaymentExistsAndAmountPaidIsLessThanAmountDue( )
 		{
-			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
+			var repo = InvoiceRepository.GetInvoiceRepository();
+			const string refKey = "INVOICE008";
+			
+			var invoice = new Invoice()
 			{
-				Amount = 10,
-				AmountPaid = 5,
-				Payments = new List<Payment>
-				{
-					new Payment
-					{
-						Amount = 5
-					}
-				}
+				Amount = 10
 			};
-			repo.Add( invoice );
+			invoice.AddPayment(new Payment
+			{
+				Amount = 5
+			});
+			
+			repo.Add( refKey, invoice );
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var paymentProcessor = new InvoicePaymentProcessor();
 
 			var payment = new Payment( )
 			{
-				Amount = 1
+				Amount = 1,
+				Reference = refKey
 			};
 
 			var result = paymentProcessor.ProcessPayment( payment );
@@ -223,25 +237,95 @@ namespace RefactorThis.Domain.Tests
 		[Test]
 		public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidIsLessThanInvoiceAmount( )
 		{
-			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
+			var repo = InvoiceRepository.GetInvoiceRepository();
+			const string refKey = "INVOICE009";
+			
+			var invoice = new Invoice()
 			{
-				Amount = 10,
-				AmountPaid = 0,
-				Payments = new List<Payment>( )
+				Amount = 10
 			};
-			repo.Add( invoice );
+			repo.Add( refKey, invoice );
 
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+			var paymentProcessor = new InvoicePaymentProcessor();
 
 			var payment = new Payment( )
 			{
-				Amount = 1
+				Amount = 1,
+				Reference = refKey
 			};
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
 			Assert.AreEqual( "invoice is now partially paid", result );
+		}
+		
+		[Test]
+		public void ProcessPayment_Should_ReturnFailureMessage_When_NullIsPassedAsThePaymentObject( )
+		{
+			var repo = InvoiceRepository.GetInvoiceRepository();
+			const string refKey = "INVOICE011";
+			
+			var invoice = new Invoice()
+			{
+				Amount = 10
+			};
+			repo.Add( refKey, invoice );
+
+			var paymentProcessor = new InvoicePaymentProcessor();
+			
+			var result = paymentProcessor.ProcessPayment( null );
+
+			Assert.AreEqual( "payment is null", result );
+		}
+		
+		[Test]
+		public void ProcessPayment_Should_ReturnFailureMessage_When_PaymentObjectWithAmountZeroIsAdded( )
+		{
+			var repo = InvoiceRepository.GetInvoiceRepository();
+			const string refKey = "INVOICE012";
+			
+			var invoice = new Invoice()
+			{
+				Amount = 10
+			};
+			repo.Add( refKey, invoice );
+
+			var paymentProcessor = new InvoicePaymentProcessor();
+			
+			var payment = new Payment( )
+			{
+				Amount = 0,
+				Reference = refKey
+			};
+			
+			var result = paymentProcessor.ProcessPayment( payment );
+
+			Assert.AreEqual( "payment amount in invalid", result );
+		}
+		
+		[Test]
+		public void ProcessPayment_Should_ReturnFailureMessage_When_PaymentObjectWithNegativeAmountIsAdded( )
+		{
+			var repo = InvoiceRepository.GetInvoiceRepository();
+			const string refKey = "INVOICE013";
+			
+			var invoice = new Invoice()
+			{
+				Amount = 10
+			};
+			repo.Add( refKey, invoice );
+
+			var paymentProcessor = new InvoicePaymentProcessor();
+			
+			var payment = new Payment( )
+			{
+				Amount = -5,
+				Reference = refKey
+			};
+			
+			var result = paymentProcessor.ProcessPayment( payment );
+
+			Assert.AreEqual( "payment amount in invalid", result );
 		}
 	}
 }
