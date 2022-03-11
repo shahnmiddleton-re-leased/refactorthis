@@ -3,3 +3,11 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
+/.vs/VSWorkspaceState.json
+/.vs/slnx.sqlite
+/.vs/refactorthis/v16/.suo
+/.vs/refactorthis/v16
+/.vs/refactorthis/DesignTimeBuild/.dtbcache.v2
+/.vs/refactorthis/DesignTimeBuild
+/Test
+/RefactorThis.Domain.Tests/RefactorThis.Domain.Tests.csproj.user
