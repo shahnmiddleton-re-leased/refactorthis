@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using FluentAssertions;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 using RefactorThis.Domain.Model;
 using RefactorThis.Domain.Services;
@@ -11,24 +9,22 @@ namespace RefactorThis.Domain.Tests
 	[TestFixture]
 	public class InvoicePaymentProcessor_Should
 	{
-		[Test]
-		public void ThrowException_When_NoInvoiceFoundForPaymentReference( )
-		{
-			var repo = new InvoiceRepository( );
+        [Test]
+        public void ReturnFailure_When_NoInvoiceFoundForPaymentReference()
+        {
+            var repo = new InvoiceRepository();
 
-			Invoice invoice = null;
-			var paymentProcessor = new InvoicePaymentProcessor( repo );
+            Invoice invoice = null;
+            var paymentProcessor = new InvoicePaymentProcessor(repo);
 
-			var payment = new Payment( );
+            var payment = new Payment();
 
-            Action act = () => paymentProcessor.ProcessPayment(payment);
+            var result = paymentProcessor.ProcessPayment(payment);
+            result.ShouldFail("There is no invoice matching this payment");
+        }
 
-			act.Should().Throw<InvalidOperationException>()
-                .WithMessage("There is no invoice matching this payment");
-		}
-
-		[Test]
-		public void ReturnFailureMessage_When_NoPaymentNeeded( )
+        [Test]
+		public void ReturnFailure_When_NoPaymentNeeded( )
 		{
 			var repo = new InvoiceRepository( );
 
@@ -47,11 +43,11 @@ namespace RefactorThis.Domain.Tests
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
-			result.Should().Be( "no payment needed");
+			result.ShouldFail("no payment needed");
 		}
 
 		[Test]
-		public void ReturnFailureMessage_When_InvoiceAlreadyFullyPaid( )
+		public void ReturnFailure_When_InvoiceAlreadyFullyPaid( )
 		{
 			var repo = new InvoiceRepository( );
 
@@ -75,11 +71,11 @@ namespace RefactorThis.Domain.Tests
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
-			result.Should().Be( "invoice was already fully paid");
+			result.ShouldFail("invoice was already fully paid");
 		}
 
 		[Test]
-		public void ReturnFailureMessage_When_PartialPaymentExistsAndAmountPaidExceedsAmountDue( )
+		public void ReturnFailure_When_PartialPaymentExistsAndAmountPaidExceedsAmountDue( )
 		{
 			var repo = new InvoiceRepository( );
 			var invoice = new Invoice
@@ -105,11 +101,11 @@ namespace RefactorThis.Domain.Tests
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
-			result.Should().Be( "the payment is greater than the partial amount remaining");
+			result.ShouldFail("the payment is greater than the partial amount remaining");
 		}
 
 		[Test]
-		public void ReturnFailureMessage_When_NoPartialPaymentExistsAndAmountPaidExceedsInvoiceAmount( )
+		public void ReturnFailure_When_NoPartialPaymentExistsAndAmountPaidExceedsInvoiceAmount( )
 		{
 			var repo = new InvoiceRepository( );
 			var invoice = new Invoice
@@ -129,7 +125,7 @@ namespace RefactorThis.Domain.Tests
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
-			result.Should().Be( "the payment is greater than the invoice amount");
+			result.ShouldFail("the payment is greater than the invoice amount");
 		}
 
 		[Test]
@@ -158,8 +154,8 @@ namespace RefactorThis.Domain.Tests
 			};
 
 			var result = paymentProcessor.ProcessPayment( payment );
-
-			result.Should().Be( "final partial payment received, invoice is now fully paid");
+			
+			result.ShouldSucceed("final partial payment received, invoice is now fully paid");
 		}
 
 		[Test]
@@ -183,7 +179,7 @@ namespace RefactorThis.Domain.Tests
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
-			result.Should().Be( "invoice was already fully paid");
+			result.ShouldFail("invoice was already fully paid");
 		}
 
 		[Test]
@@ -213,7 +209,7 @@ namespace RefactorThis.Domain.Tests
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
-			result.Should().Be( "another partial payment received, still not fully paid");
+			result.ShouldSucceed("another partial payment received, still not fully paid");
 		}
 
 		[Test]
@@ -237,13 +233,13 @@ namespace RefactorThis.Domain.Tests
 
 			var result = paymentProcessor.ProcessPayment( payment );
 
-			result.Should().Be( "invoice is now partially paid");
+			result.ShouldSucceed("invoice is now partially paid");
 		}
 
 
 		// **********  ADDITIONAL TESTS FOR MISSING SCENARIOS **********
 		[Test]
-        public void ThrowException_When_ZeroAmountAndHasPayments()
+        public void ReturnFailure_When_ZeroAmountAndHasPayments()
         {
             var repo = new InvoiceRepository();
 
@@ -266,10 +262,9 @@ namespace RefactorThis.Domain.Tests
 
             var payment = new Payment();
 
-            Action act = () => paymentProcessor.ProcessPayment(payment);
+            var result = paymentProcessor.ProcessPayment(payment);
 
-            act.Should().Throw<InvalidOperationException>()
-                .WithMessage("The invoice is in an invalid state, it has an amount of 0 and it has payments.");
+            result.ShouldFail("The invoice is in an invalid state, it has an amount of 0 and it has payments.");
         }
 
         [Test]
@@ -293,7 +288,7 @@ namespace RefactorThis.Domain.Tests
 
             var result = paymentProcessor.ProcessPayment(payment);
 
-            result.Should().Be("invoice is now fully paid");
+            result.ShouldSucceed("invoice is now fully paid");
         }
 	}
 }

@@ -1,5 +1,4 @@
-using System;
-using System.Linq;
+using FluentResults;
 using RefactorThis.Domain.Model;
 using RefactorThis.Domain.Repositories;
 
@@ -14,20 +13,23 @@ namespace RefactorThis.Domain.Services
 			_invoiceRepository = invoiceRepository;
 		}
 
-		public string ProcessPayment( Payment payment )
+		public Result ProcessPayment( Payment payment )
 		{
 			var invoice = _invoiceRepository.GetInvoice( payment.Reference );
 
 			if ( invoice == null )
 			{
-				throw new InvalidOperationException( "There is no invoice matching this payment" );
+				return Result.Fail("There is no invoice matching this payment" );
 			}
 
-            var responseMessage = invoice.AddPayment(payment);
+            var result = invoice.AddPayment(payment);
 
-            _invoiceRepository.SaveInvoice(invoice);
+            if (result.IsSuccess)
+            {
+                _invoiceRepository.SaveInvoice(invoice);
+            }
 
-			return responseMessage;
+			return result;
 		}
 	}
 }
