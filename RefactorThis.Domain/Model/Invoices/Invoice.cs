@@ -35,7 +35,7 @@ namespace RefactorThis.Domain.Model.Invoices
             string successMessage;
             if (HasPayments)
             {
-                successMessage = FinalPartialPaymentReceived(payment) 
+                successMessage = IsFinalPartialPaymentReceived(payment) 
                     ? "final partial payment received, invoice is now fully paid" 
                     : "another partial payment received, still not fully paid";
 
@@ -43,7 +43,7 @@ namespace RefactorThis.Domain.Model.Invoices
             }
             else
             {
-                successMessage = FullPaymentReceived(payment) 
+                successMessage = IsFullPaymentReceived(payment) 
                     ? "invoice is now fully paid" 
                     : "invoice is now partially paid";
                     
@@ -54,12 +54,12 @@ namespace RefactorThis.Domain.Model.Invoices
             return Result.Ok().WithSuccess(successMessage);
         }
 
-        private bool FullPaymentReceived(Payment payment)
+        private bool IsFullPaymentReceived(Payment payment)
         {
             return Amount == payment.Amount;
         }
 
-        private bool FinalPartialPaymentReceived(Payment payment)
+        private bool IsFinalPartialPaymentReceived(Payment payment)
         {
             return Amount - AmountPaid == payment.Amount;
         }

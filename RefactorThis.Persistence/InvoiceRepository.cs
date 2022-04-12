@@ -4,21 +4,13 @@ using RefactorThis.Domain.Repositories;
 namespace RefactorThis.Persistence {
     public class InvoiceRepository : IInvoiceRepository
     {
-		private Invoice _invoice;
-
 		public Invoice GetInvoice( string reference )
 		{
-			return _invoice;
-		}
-
-		public void SaveInvoice( Invoice invoice )
-		{
-			//saves the invoice to the database
+			return null;
 		}
 
 		public void Add( Invoice invoice )
 		{
-			_invoice = invoice;
 		}
 	}
 }

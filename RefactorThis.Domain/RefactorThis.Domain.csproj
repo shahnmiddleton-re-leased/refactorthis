@@ -49,6 +49,7 @@
     <Compile Include="Model\Invoices\Rules\PaymentGreaterThanInvoiceAmount.cs" />
     <Compile Include="Model\Invoices\Rules\PaymentGreaterThanRemainingInvoiceAmount.cs" />
     <Compile Include="Model\Invoices\Rules\PaymentsForZeroInvoiceAmount.cs" />
+    <Compile Include="Repositories\IUnitOfWork.cs" />
     <Compile Include="Repositories\IInvoiceRepository.cs" />
     <Compile Include="Services\InvoicePaymentProcessor.cs" />
     <Compile Include="Model\Invoices\Payment.cs" />

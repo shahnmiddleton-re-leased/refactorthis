@@ -6,16 +6,16 @@ namespace RefactorThis.Domain.Services
 {
 	public class InvoicePaymentProcessor
 	{
-		private readonly IInvoiceRepository _invoiceRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-		public InvoicePaymentProcessor(IInvoiceRepository invoiceRepository )
-		{
-			_invoiceRepository = invoiceRepository;
-		}
+		public InvoicePaymentProcessor(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
 
 		public Result ProcessPayment( Payment payment )
 		{
-			var invoice = _invoiceRepository.GetInvoice( payment.Reference );
+			var invoice = _unitOfWork.Invoices.GetInvoice( payment.Reference );
 
 			if ( invoice == null )
 			{
@@ -26,10 +26,12 @@ namespace RefactorThis.Domain.Services
 
             if (result.IsSuccess)
             {
-                _invoiceRepository.SaveInvoice(invoice);
+                _unitOfWork.Save();
             }
 
 			return result;
 		}
+
+		public IUnitOfWork UnitOfWork => _unitOfWork;
 	}
 }
