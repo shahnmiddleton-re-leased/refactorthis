@@ -163,7 +163,7 @@ namespace RefactorThis.Domain.Tests
 		}
 
 		[Test]
-		public void ReturnFullyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidEqualsInvoiceAmount( )
+		public void ReturnFullyPaidMessage_When_InvoiceAlreadyPaid( )
 		{
 			var repo = new InvoiceRepository( );
 			var invoice = new Invoice
@@ -239,5 +239,61 @@ namespace RefactorThis.Domain.Tests
 
 			result.Should().Be( "invoice is now partially paid");
 		}
+
+
+		// **********  ADDITIONAL TESTS FOR MISSING SCENARIOS **********
+		[Test]
+        public void ThrowException_When_ZeroAmountAndHasPayments()
+        {
+            var repo = new InvoiceRepository();
+
+            var invoice = new Invoice
+            {
+                Amount = 0,
+                AmountPaid = 0,
+                Payments = new List<Payment>
+                {
+                    new Payment
+                    {
+                        Amount = 5
+                    }
+                }
+            };
+
+            repo.Add(invoice);
+
+            var paymentProcessor = new InvoicePaymentProcessor(repo);
+
+            var payment = new Payment();
+
+            Action act = () => paymentProcessor.ProcessPayment(payment);
+
+            act.Should().Throw<InvalidOperationException>()
+                .WithMessage("The invoice is in an invalid state, it has an amount of 0 and it has payments.");
+        }
+
+        [Test]
+        public void ReturnFullyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidEqualsInvoiceAmount()
+        {
+            var repo = new InvoiceRepository();
+            var invoice = new Invoice
+            {
+                Amount = 5,
+                AmountPaid = 0,
+                Payments = new List<Payment>()
+            };
+            repo.Add(invoice);
+
+            var paymentProcessor = new InvoicePaymentProcessor(repo);
+
+            var payment = new Payment()
+            {
+                Amount = 5
+            };
+
+            var result = paymentProcessor.ProcessPayment(payment);
+
+            result.Should().Be("invoice is now fully paid");
+        }
 	}
 }
