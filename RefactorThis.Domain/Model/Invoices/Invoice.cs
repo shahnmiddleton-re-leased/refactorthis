@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentResults;
 
-namespace RefactorThis.Domain.Model
+namespace RefactorThis.Domain.Model.Invoices
 {
     public class Invoice
 	{
@@ -18,8 +18,8 @@ namespace RefactorThis.Domain.Model
         public decimal Amount { get; private set; }
 		public decimal AmountPaid { get; private set; }
 
-        public decimal PaymentsRunningTotal => _payments.Sum(x => x.Amount);
-        public bool HasPayments => _payments.Any();
+        public decimal PaymentsRunningTotal => Payments.Sum(x => x.Amount);
+        public bool HasPayments => Payments.Any();
 
         private readonly List<Payment> _payments = new List<Payment>();
         public IReadOnlyList<Payment> Payments => _payments;
@@ -32,30 +32,36 @@ namespace RefactorThis.Domain.Model
                 return validationResult;
             }
 
+            string successMessage;
             if (HasPayments)
             {
-                if ((Amount - AmountPaid) == payment.Amount)
-                {
-                    AmountPaid += payment.Amount;
-                    _payments.Add(payment);
-                    return Result.Ok().WithSuccess("final partial payment received, invoice is now fully paid");
-                }
+                successMessage = FinalPartialPaymentReceived(payment) 
+                    ? "final partial payment received, invoice is now fully paid" 
+                    : "another partial payment received, still not fully paid";
 
                 AmountPaid += payment.Amount;
-                _payments.Add(payment);
-                return Result.Ok().WithSuccess("another partial payment received, still not fully paid");
             }
-
-            if (Amount == payment.Amount)
+            else
             {
+                successMessage = FullPaymentReceived(payment) 
+                    ? "invoice is now fully paid" 
+                    : "invoice is now partially paid";
+                    
                 AmountPaid = payment.Amount;
-                _payments.Add(payment);
-                return Result.Ok().WithSuccess("invoice is now fully paid");
             }
 
-            AmountPaid = payment.Amount;
             _payments.Add(payment);
-            return Result.Ok().WithSuccess("invoice is now partially paid");
+            return Result.Ok().WithSuccess(successMessage);
+        }
+
+        private bool FullPaymentReceived(Payment payment)
+        {
+            return Amount == payment.Amount;
+        }
+
+        private bool FinalPartialPaymentReceived(Payment payment)
+        {
+            return Amount - AmountPaid == payment.Amount;
         }
     }
 }

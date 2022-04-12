@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using RefactorThis.Domain.Model;
+using RefactorThis.Domain.Model.Invoices;
 
 namespace RefactorThis.Domain.Tests.TestHelpers
 {

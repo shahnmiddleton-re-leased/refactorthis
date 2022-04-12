@@ -1,4 +1,4 @@
-﻿using RefactorThis.Domain.Model;
+﻿using RefactorThis.Domain.Model.Invoices;
 using TestStack.Dossier;
 using TestStack.Dossier.EquivalenceClasses;
 

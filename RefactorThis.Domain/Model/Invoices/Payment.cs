@@ -1,4 +1,4 @@
-namespace RefactorThis.Domain.Model
+namespace RefactorThis.Domain.Model.Invoices
 {
 	public class Payment
 	{

@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using RefactorThis.Domain.Model;
+using RefactorThis.Domain.Model.Invoices;
 using RefactorThis.Domain.Services;
 using RefactorThis.Domain.Tests.TestHelpers;
 using RefactorThis.Persistence;
