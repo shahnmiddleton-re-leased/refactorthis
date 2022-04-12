@@ -116,6 +116,7 @@
     <Compile Include="InvoicePaymentProcessorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestHelpers\PaymentBuilder.cs" />
+    <Compile Include="TestHelpers\SystemUnderTestIs.cs" />
     <Compile Include="TestHelpers\TestData.cs" />
   </ItemGroup>
   <ItemGroup>
