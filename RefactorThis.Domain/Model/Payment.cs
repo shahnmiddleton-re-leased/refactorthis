@@ -2,7 +2,15 @@ namespace RefactorThis.Domain.Model
 {
 	public class Payment
 	{
-		public decimal Amount { get; set; }
-		public string Reference { get; set; }
+        public Payment(decimal amount, string reference)
+        {
+            Amount = amount;
+            Reference = reference;
+        }
+
+        private Payment(){}
+
+        public decimal Amount { get; private set; }
+		public string Reference { get; private set; }
 	}
 }
