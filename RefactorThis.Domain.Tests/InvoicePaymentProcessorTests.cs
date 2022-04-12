@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using FluentAssertions;
 using NUnit.Framework;
+using RefactorThis.Domain.Model;
+using RefactorThis.Domain.Services;
 using RefactorThis.Persistence;
 
 namespace RefactorThis.Domain.Tests
@@ -30,7 +32,7 @@ namespace RefactorThis.Domain.Tests
 		{
 			var repo = new InvoiceRepository( );
 
-			var invoice = new Invoice( repo )
+			var invoice = new Invoice
 			{
 				Amount = 0,
 				AmountPaid = 0,
@@ -53,7 +55,7 @@ namespace RefactorThis.Domain.Tests
 		{
 			var repo = new InvoiceRepository( );
 
-			var invoice = new Invoice( repo )
+			var invoice = new Invoice
 			{
 				Amount = 10,
 				AmountPaid = 10,
@@ -80,7 +82,7 @@ namespace RefactorThis.Domain.Tests
 		public void ReturnFailureMessage_When_PartialPaymentExistsAndAmountPaidExceedsAmountDue( )
 		{
 			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
+			var invoice = new Invoice
 			{
 				Amount = 10,
 				AmountPaid = 5,
@@ -110,7 +112,7 @@ namespace RefactorThis.Domain.Tests
 		public void ReturnFailureMessage_When_NoPartialPaymentExistsAndAmountPaidExceedsInvoiceAmount( )
 		{
 			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
+			var invoice = new Invoice
 			{
 				Amount = 5,
 				AmountPaid = 0,
@@ -134,7 +136,7 @@ namespace RefactorThis.Domain.Tests
 		public void ReturnFullyPaidMessage_When_PartialPaymentExistsAndAmountPaidEqualsAmountDue( )
 		{
 			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
+			var invoice = new Invoice
 			{
 				Amount = 10,
 				AmountPaid = 5,
@@ -164,7 +166,7 @@ namespace RefactorThis.Domain.Tests
 		public void ReturnFullyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidEqualsInvoiceAmount( )
 		{
 			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
+			var invoice = new Invoice
 			{
 				Amount = 10,
 				AmountPaid = 0,
@@ -188,7 +190,7 @@ namespace RefactorThis.Domain.Tests
 		public void ReturnPartiallyPaidMessage_When_PartialPaymentExistsAndAmountPaidIsLessThanAmountDue( )
 		{
 			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
+			var invoice = new Invoice
 			{
 				Amount = 10,
 				AmountPaid = 5,
@@ -218,7 +220,7 @@ namespace RefactorThis.Domain.Tests
 		public void ReturnPartiallyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidIsLessThanInvoiceAmount( )
 		{
 			var repo = new InvoiceRepository( );
-			var invoice = new Invoice( repo )
+			var invoice = new Invoice
 			{
 				Amount = 10,
 				AmountPaid = 0,

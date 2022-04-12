@@ -1,14 +1,15 @@
 using System;
 using System.Linq;
-using RefactorThis.Persistence;
+using RefactorThis.Domain.Model;
+using RefactorThis.Domain.Repositories;
 
-namespace RefactorThis.Domain
+namespace RefactorThis.Domain.Services
 {
 	public class InvoicePaymentProcessor
 	{
-		private readonly InvoiceRepository _invoiceRepository;
+		private readonly IInvoiceRepository _invoiceRepository;
 
-		public InvoicePaymentProcessor( InvoiceRepository invoiceRepository )
+		public InvoicePaymentProcessor(IInvoiceRepository invoiceRepository )
 		{
 			_invoiceRepository = invoiceRepository;
 		}
@@ -86,7 +87,7 @@ namespace RefactorThis.Domain
 				}
 			}
 			
-			inv.Save();
+			_invoiceRepository.SaveInvoice(inv);
 
 			return responseMessage;
 		}
