@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\Invoice.cs" />
+    <Compile Include="Model\InvoicePaymentValidator.cs" />
     <Compile Include="Repositories\IInvoiceRepository.cs" />
     <Compile Include="Services\InvoicePaymentProcessor.cs" />
     <Compile Include="Model\Payment.cs" />
