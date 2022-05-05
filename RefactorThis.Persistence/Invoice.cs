@@ -1,22 +1,23 @@
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RefactorThis.Persistence
 {
-	public class Invoice
-	{
-		private readonly InvoiceRepository _repository;
-		public Invoice( InvoiceRepository repository )
-		{
-			_repository = repository;
-		}
+    public class Invoice
+    {
+        public Invoice()
+        {
+            Payments = new HashSet<Payment>();
+        }
 
-		public void Save( )
-		{
-			_repository.SaveInvoice( this );
-		}
+        [Key]
+        [Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Reference { get; set; }
 
-		public decimal Amount { get; set; }
-		public decimal AmountPaid { get; set; }
-		public List<Payment> Payments { get; set; }
-	}
+        public decimal Amount { get; set; }
+        public virtual ICollection<Payment> Payments { get; set; }
+    }
 }
