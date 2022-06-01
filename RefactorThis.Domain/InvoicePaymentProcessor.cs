@@ -1,94 +1,89 @@
 using System;
 using System.Linq;
+using RefactorThis.Domain.Properties;
 using RefactorThis.Persistence;
 
 namespace RefactorThis.Domain
 {
-	public class InvoicePaymentProcessor
+	public class InvoicePaymentProcessor : IInvoicePaymentProcessor
 	{
-		private readonly InvoiceRepository _invoiceRepository;
-
-		public InvoicePaymentProcessor( InvoiceRepository invoiceRepository )
+		private readonly IInvoiceRepository _invoiceRepository;
+		public InvoicePaymentProcessor(IInvoiceRepository invoiceRepository)
 		{
 			_invoiceRepository = invoiceRepository;
 		}
 
-		public string ProcessPayment( Payment payment )
+		/// <summary>
+		/// Validate and Process payment
+		/// </summary>
+		/// <param name="payment"></param>
+		/// <returns>Returns user message based on payment processed</returns>
+		public string ProcessPayment(Payment payment)
 		{
-			var inv = _invoiceRepository.GetInvoice( payment.Reference );
+			var inv = _invoiceRepository.GetInvoice(payment.Reference);
 
-			var responseMessage = string.Empty;
+			if (inv == null)
+				throw new InvalidOperationException(Resources.NoMatchingInvoice);
 
-			if ( inv == null )
+			if (inv.Amount == 0)
 			{
-				throw new InvalidOperationException( "There is no invoice matching this payment" );
-			}
-			else
-			{
-				if ( inv.Amount == 0 )
+				if (inv.Amount == 0 && (inv.Payments == null || inv.Payments.Count == 0))
 				{
-					if ( inv.Payments == null || !inv.Payments.Any( ) )
-					{
-						responseMessage = "no payment needed";
-					}
-					else
-					{
-						throw new InvalidOperationException( "The invoice is in an invalid state, it has an amount of 0 and it has payments." );
-					}
+					return Resources.NoPaymentNeeded;
 				}
 				else
+					throw new InvalidOperationException(Resources.InvoiceInInvalidState);
+			}
+
+			var responseMessage = ProcessPayment(inv, payment);
+			return responseMessage;
+		}
+
+		private string ProcessPayment(Invoice inv, Payment payment)
+		{
+			try
+			{
+				string responseMessage;
+
+				decimal invoicePayment = inv.Payments.Sum(x => x.Amount);
+				decimal invoiceAmount = inv.Amount;
+				decimal invoiceFinalAmount = invoiceAmount - inv.AmountPaid;
+				bool partPaymentExists = invoicePayment > 0;
+
+				if (invoiceAmount == invoicePayment)
+					return Resources.InvoiceAlreadyPaid;
+
+				if (payment.Amount <= invoiceFinalAmount)
 				{
-					if ( inv.Payments != null && inv.Payments.Any( ) )
+					// Paid amount is equal to remaining amount
+					if (invoiceFinalAmount == payment.Amount)
 					{
-						if ( inv.Payments.Sum( x => x.Amount ) != 0 && inv.Amount == inv.Payments.Sum( x => x.Amount ) )
-						{
-							responseMessage = "invoice was already fully paid";
-						}
-						else if ( inv.Payments.Sum( x => x.Amount ) != 0 && payment.Amount > ( inv.Amount - inv.AmountPaid ) )
-						{
-							responseMessage = "the payment is greater than the partial amount remaining";
-						}
-						else
-						{
-							if ( ( inv.Amount - inv.AmountPaid ) == payment.Amount )
-							{
-								inv.AmountPaid += payment.Amount;
-								inv.Payments.Add( payment );
-								responseMessage = "final partial payment received, invoice is now fully paid";
-							}
-							else
-							{
-								inv.AmountPaid += payment.Amount;
-								inv.Payments.Add( payment );
-								responseMessage = "another partial payment received, still not fully paid";
-							}
-						}
+						inv.AmountPaid += payment.Amount;
+						inv.Payments.Add(payment);
+						responseMessage = partPaymentExists ? Resources.FinalPartialPaymentInvoiceFullyPaid : Resources.InvoiceFullyPaid;
 					}
+					// Paid amount is less than remaining amount
 					else
 					{
-						if ( payment.Amount > inv.Amount )
-						{
-							responseMessage = "the payment is greater than the invoice amount";
-						}
-						else if ( inv.Amount == payment.Amount )
-						{
-							inv.AmountPaid = payment.Amount;
-							inv.Payments.Add( payment );
-							responseMessage = "invoice is now fully paid";
-						}
-						else
-						{
-							inv.AmountPaid = payment.Amount;
-							inv.Payments.Add( payment );
-							responseMessage = "invoice is now partially paid";
-						}
+						inv.AmountPaid += payment.Amount;
+						inv.Payments.Add(payment);
+						responseMessage = partPaymentExists ? Resources.PartialPaymentInvoiceNotFullyPaid : Resources.InvoicePartialPaid;
 					}
 				}
-			}
-			
-			inv.Save();
 
-			return responseMessage;
+				// Paid amount is more than remaining amount
+				else
+					responseMessage = partPaymentExists ? Resources.OverpaidPartialPayment : Resources.PaymentOverpaid;
+
+				_invoiceRepository.SaveInvoice(inv);
+				return responseMessage;
+
+			}
+			catch (Exception e)
+			{
+				// Write to log e.message
+				return Resources.ErrorMessage;
+			}
 		}
 	}
 }
