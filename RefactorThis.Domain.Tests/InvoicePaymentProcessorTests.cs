@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using RefactorThis.Domain;
+using Refactor.Process.InvoicePaymentProcessing;
+using RefactorThis.Domain.Model;
 using RefactorThis.Persistence;
 
 namespace RefactorThis.Tests
@@ -9,20 +10,20 @@ namespace RefactorThis.Tests
     [TestFixture]
     public class InvoicePaymentProcessorTests
     {
-        private InvoiceRepository _invoiceRepository;
+        private Repository<Invoice> _invoiceRepository;
         private InvoicePaymentProcessor _paymentProcessor;
 
         [SetUp]
         public void SetUp()
         {
-            _invoiceRepository = new InvoiceRepository();
+            _invoiceRepository = new Repository<Invoice>();
             _paymentProcessor = new InvoicePaymentProcessor(_invoiceRepository);
         }
 
         [Test]
         public void ProcessPayment_Should_ThrowException_When_NoInoiceFoundForPaymentReference()
         {
-            var payment = new Payment();
+            var payment = new Payment(Guid.NewGuid().ToString());
             var failureMessage = "";
 
             try
@@ -40,8 +41,8 @@ namespace RefactorThis.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_NoPaymentNeeded()
         {
-
-            var invoice = new Invoice(_invoiceRepository)
+            var invId = Guid.NewGuid().ToString();
+            var invoice = new Invoice(invId)
             {
                 Amount = 0,
                 AmountPaid = 0,
@@ -50,7 +51,7 @@ namespace RefactorThis.Tests
 
             _invoiceRepository.Add(invoice);
 
-            var payment = new Payment();
+            var payment = new Payment(invId);
 
             var result = _paymentProcessor.ProcessPayment(payment);
 
@@ -60,13 +61,14 @@ namespace RefactorThis.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_InvoiceAlreadyFullyPaid()
         {
-            var invoice = new Invoice(_invoiceRepository)
+            var invId = Guid.NewGuid().ToString();
+            var invoice = new Invoice(invId)
             {
                 Amount = 10,
                 AmountPaid = 10,
                 Payments = new List<Payment>
                 {
-                    new Payment
+                    new Payment(invId)
                     {
                         Amount = 10
                     }
@@ -74,7 +76,7 @@ namespace RefactorThis.Tests
             };
             _invoiceRepository.Add(invoice);
 
-            var payment = new Payment();
+            var payment = new Payment(invId);
             var result = _paymentProcessor.ProcessPayment(payment);
 
             Assert.AreEqual("invoice was already fully paid", result);
@@ -83,13 +85,14 @@ namespace RefactorThis.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_PartialPaymentExistsAndAmountPaidExceedsAmountDue()
         {
-            var invoice = new Invoice(_invoiceRepository)
+            var invId = Guid.NewGuid().ToString();
+            var invoice = new Invoice(invId)
             {
                 Amount = 10,
                 AmountPaid = 5,
                 Payments = new List<Payment>
                 {
-                    new Payment
+                    new Payment(invId)
                     {
                         Amount = 5
                     }
@@ -97,7 +100,7 @@ namespace RefactorThis.Tests
             };
             _invoiceRepository.Add(invoice);
 
-            var payment = new Payment()
+            var payment = new Payment(invId)
             {
                 Amount = 6
             };
@@ -109,7 +112,8 @@ namespace RefactorThis.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFailureMessage_When_NoPartialPaymentExistsAndAmountPaidExceedsInvoiceAmount()
         {
-            var invoice = new Invoice(_invoiceRepository)
+            var invId = Guid.NewGuid().ToString();
+            var invoice = new Invoice(invId)
             {
                 Amount = 5,
                 AmountPaid = 0,
@@ -117,7 +121,7 @@ namespace RefactorThis.Tests
             };
             _invoiceRepository.Add(invoice);
 
-            var payment = new Payment()
+            var payment = new Payment(invId)
             {
                 Amount = 6
             };
@@ -130,13 +134,14 @@ namespace RefactorThis.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFullyPaidMessage_When_PartialPaymentExistsAndAmountPaidEqualsAmountDue()
         {
-            var invoice = new Invoice(_invoiceRepository)
+            var invId = Guid.NewGuid().ToString();
+            var invoice = new Invoice(invId)
             {
                 Amount = 10,
                 AmountPaid = 5,
                 Payments = new List<Payment>
                 {
-                    new Payment
+                    new Payment(invId)
                     {
                         Amount = 5
                     }
@@ -144,7 +149,7 @@ namespace RefactorThis.Tests
             };
             _invoiceRepository.Add(invoice);
 
-            var payment = new Payment()
+            var payment = new Payment(invId)
             {
                 Amount = 5
             };
@@ -157,15 +162,16 @@ namespace RefactorThis.Tests
         [Test]
         public void ProcessPayment_Should_ReturnFullyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidEqualsInvoiceAmount()
         {
-            var invoice = new Invoice(_invoiceRepository)
+            var invId = Guid.NewGuid().ToString();
+            var invoice = new Invoice(invId)
             {
                 Amount = 10,
                 AmountPaid = 0,
-                Payments = new List<Payment>() { new Payment() { Amount = 10 } }
+                Payments = new List<Payment>() { new Payment(invId) { Amount = 10 } }
             };
             _invoiceRepository.Add(invoice);
 
-            var payment = new Payment()
+            var payment = new Payment(invId)
             {
                 Amount = 10
             };
@@ -178,13 +184,14 @@ namespace RefactorThis.Tests
         [Test]
         public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_PartialPaymentExistsAndAmountPaidIsLessThanAmountDue()
         {
-            var invoice = new Invoice(_invoiceRepository)
+            var invId = Guid.NewGuid().ToString();
+            var invoice = new Invoice(invId)
             {
                 Amount = 10,
                 AmountPaid = 5,
                 Payments = new List<Payment>
                 {
-                    new Payment
+                    new Payment(invId)
                     {
                         Amount = 5
                     }
@@ -192,7 +199,7 @@ namespace RefactorThis.Tests
             };
             _invoiceRepository.Add(invoice);
 
-            var payment = new Payment()
+            var payment = new Payment(invId)
             {
                 Amount = 1
             };
@@ -205,7 +212,8 @@ namespace RefactorThis.Tests
         [Test]
         public void ProcessPayment_Should_ReturnPartiallyPaidMessage_When_NoPartialPaymentExistsAndAmountPaidIsLessThanInvoiceAmount()
         {
-            var invoice = new Invoice(_invoiceRepository)
+            var invId = Guid.NewGuid().ToString();
+            var invoice = new Invoice(invId)
             {
                 Amount = 10,
                 AmountPaid = 0,
@@ -213,7 +221,7 @@ namespace RefactorThis.Tests
             };
             _invoiceRepository.Add(invoice);
 
-            var payment = new Payment()
+            var payment = new Payment(invId)
             {
                 Amount = 1
             };

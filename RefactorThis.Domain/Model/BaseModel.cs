@@ -1,7 +1,14 @@
-﻿namespace RefactorThis.Domain.Model
+﻿using System;
+
+namespace RefactorThis.Domain.Model
 {
     public class BaseModel
     {
-        public string Reference { get; set; }
+        public string Id { get; set; }
+
+        public BaseModel(string id)
+        {
+            Id = id;
+        }
     }
 }

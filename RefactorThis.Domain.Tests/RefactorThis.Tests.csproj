@@ -48,6 +48,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Refactor.Process\Refactor.Process.csproj">
+      <Project>{f218f9e7-063d-4400-b482-09560b431af9}</Project>
+      <Name>Refactor.Process</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RefactorThis.Application\RefactorThis.Application.csproj">
+      <Project>{ea853b11-c24e-49c2-a14f-98e9f683e685}</Project>
+      <Name>RefactorThis.Application</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RefactorThis.Domain\RefactorThis.Domain.csproj">
       <Project>{5310b2fe-e26d-414e-b656-1f74c5a70368}</Project>
       <Name>RefactorThis.Domain</Name>
