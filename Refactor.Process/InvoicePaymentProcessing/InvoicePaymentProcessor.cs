@@ -3,9 +3,6 @@ using RefactorThis.Domain.Model;
 using RefactorThis.Domain.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Refactor.Process.InvoicePaymentProcessing
 {
