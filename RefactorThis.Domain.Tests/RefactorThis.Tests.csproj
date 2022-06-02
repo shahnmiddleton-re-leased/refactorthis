@@ -4,11 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5310B2FE-E26D-414E-B656-1F74C5A70368}</ProjectGuid>
+    <ProjectGuid>{7971BDEC-EAD1-4FB8-A4F5-B1F67E4F6355}</ProjectGuid>
+    <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RefactorThis.Domain</RootNamespace>
-    <AssemblyName>RefactorThis.Domain</AssemblyName>
+    <RootNamespace>RefactorThis.Domain.Tests</RootNamespace>
+    <AssemblyName>RefactorThis.Domain.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -36,14 +37,33 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
+      <HintPath>..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\BaseModel.cs" />
-    <Compile Include="Model\Invoice.cs" />
-    <Compile Include="Model\Payment.cs" />
+    <Compile Include="InvoicePaymentProcessorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\IInvoicePaymentProcessor.cs" />
-    <Compile Include="Services\IRepository.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Refactor.Process\Refactor.Process.csproj">
+      <Project>{f218f9e7-063d-4400-b482-09560b431af9}</Project>
+      <Name>Refactor.Process</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RefactorThis.Application\RefactorThis.Application.csproj">
+      <Project>{ea853b11-c24e-49c2-a14f-98e9f683e685}</Project>
+      <Name>RefactorThis.Application</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RefactorThis.Domain\RefactorThis.Domain.csproj">
+      <Project>{5310b2fe-e26d-414e-b656-1f74c5a70368}</Project>
+      <Name>RefactorThis.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RefactorThis.Persistence\RefactorThis.Persistence.csproj">
+      <Project>{33cdc796-ff75-449c-9637-59c2efc46361}</Project>
+      <Name>RefactorThis.Persistence</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
