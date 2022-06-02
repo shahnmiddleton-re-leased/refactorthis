@@ -44,5 +44,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\InvoicePaymentProcessor.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RefactorThis.Domain\RefactorThis.Domain.csproj">
+      <Project>{5310b2fe-e26d-414e-b656-1f74c5a70368}</Project>
+      <Name>RefactorThis.Domain</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
