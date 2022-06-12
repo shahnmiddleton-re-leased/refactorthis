@@ -3,3 +3,8 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
+/.vs/VSWorkspaceState.json
+/.vs/slnx.sqlite
+/.vs/refactorthis/v16/TestStore/0/testlog.manifest
+/.vs/refactorthis/v16/TestStore/0/000.testlog
+/.vs/refactorthis/v16/.suo

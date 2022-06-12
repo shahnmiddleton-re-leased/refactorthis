@@ -173,7 +173,7 @@ namespace RefactorThis.Domain.Tests
 			var invoice = new Invoice( repo )
 			{
 				Amount = 10,
-				AmountPaid = 0,
+				AmountPaid = 10,
 				Payments = new List<Payment>( ) { new Payment( ) { Amount = 10 } }
 			};
 			repo.Add( invoice );
