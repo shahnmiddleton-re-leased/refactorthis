@@ -21,13 +21,13 @@ namespace RefactorThis.Persistence
 
         public string ProcessPayment(Payment payment)
         {
-            var amoundPaid = AmountPaid();
+            var amountPaid = AmountPaid();
             Payments.Add(payment);
             _repository.SaveInvoice(this);
 
-            if (amoundPaid > 0)
+            if (amountPaid > 0)
             {
-                if ((Amount - amoundPaid) == payment.Amount)
+                if ((Amount - amountPaid) == payment.Amount)
                 {
                     return "final partial payment received, invoice is now fully paid";
                 }
